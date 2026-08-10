@@ -13,7 +13,7 @@
 ## 📊 Summary of Work
 
 ### ✅ Task 1: Studio Folder Structure
-- Verified and cleaned up `studio-group-design-system`
+- Verified and cleaned up `group-design-system`
 - Updated package.json with proper metadata
 - Added environment variable support
 
@@ -118,7 +118,7 @@ TEST_INTEGRATION.md                ← Verification results
 
 ### Studio Setup
 ```
-studio-group-design-system/
+group-design-system/
 ├── sanity.config.js              ← Enhanced with env support
 ├── .env.example                  ← Template
 ├── .env.local.example            ← Detailed template

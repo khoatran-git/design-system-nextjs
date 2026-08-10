@@ -11,7 +11,7 @@ Git/
 │   ├── .env.local                      ← You create this
 │   └── ENV_SETUP.md                    ← App-specific guide
 │
-└── studio-group-design-system/         ← Sanity Studio
+└── group-design-system/         ← Sanity Studio
     ├── .env.example
     ├── .env.local.example
     ├── .env.local                      ← Optional, you create if needed
@@ -44,7 +44,7 @@ npm run dev
 ### For Sanity Studio
 
 ```bash
-cd studio-group-design-system
+cd group-design-system
 
 # Optional: Create .env.local if you want to customize
 cp .env.local.example .env.local
@@ -324,7 +324,7 @@ Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)
 | File | Purpose | Required |
 |------|---------|----------|
 | `shadcn-showcase/.env.local` | App config + token | ✅ Yes |
-| `studio-group-design-system/.env.local` | Studio config | ❌ No |
+| `group-design-system/.env.local` | Studio config | ❌ No |
 
 ---
 
@@ -377,5 +377,5 @@ cat .env.local | ssh user@server "cat > app/.env.local"
 ## Questions?
 
 - **App setup:** See `shadcn-showcase/ENV_SETUP.md`
-- **Studio setup:** See `studio-group-design-system/ENV_SETUP.md`
+- **Studio setup:** See `group-design-system/ENV_SETUP.md`
 - **Sanity docs:** https://www.sanity.io/docs

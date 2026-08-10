@@ -70,7 +70,7 @@ This is the complete setup guide for the Group Design System with Sanity CMS int
 │   ├── SANITY_SETUP.md                     # Integration guide
 │   └── package.json
 │
-├── studio-group-design-system/             ← SANITY STUDIO
+├── group-design-system/             ← SANITY STUDIO
 │   ├── sanity.config.js                    # Studio configuration
 │   ├── schemaTypes/
 │   │   ├── component.js                    # Component document type
@@ -623,7 +623,7 @@ Documentation:
 ├── shadcn-showcase/
 │   ├── ENV_SETUP.md            ← App env guide
 │   └── SANITY_SETUP.md         ← Integration guide
-└── studio-group-design-system/
+└── group-design-system/
     ├── ENV_SETUP.md            ← Studio env guide
     ├── STUDIO_SETUP.md         ← Studio guide
     └── STUDIO_ACCESS.md        ← Access instructions
@@ -635,7 +635,7 @@ Code:
 │   ├── lib/sanity.utils.js     ← Helpers
 │   ├── lib/api-helpers.js      ← API utilities
 │   └── src/app/api/            ← API routes
-└── studio-group-design-system/
+└── group-design-system/
     ├── sanity.config.js        ← Studio config
     └── schemaTypes/            ← Content types
 ```

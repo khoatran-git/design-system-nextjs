@@ -131,7 +131,7 @@ curl http://localhost:3000/api/components
 | ENV_CONFIGURATION.md | Environment variables setup |
 | SANITY_SETUP_COMPLETE.md | Complete setup guide |
 | shadcn-showcase/ENV_SETUP.md | App-specific env guide |
-| studio-group-design-system/STUDIO_SETUP.md | Studio guide |
+| group-design-system/STUDIO_SETUP.md | Studio guide |
 
 ## 🔒 Security
 

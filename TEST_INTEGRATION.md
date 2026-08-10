@@ -22,7 +22,7 @@
 - Environment validation - ✅ In place
 
 ## ✅ Studio Setup
-- `studio-group-design-system/sanity.config.js` - ✅ Environment-aware
+- `group-design-system/sanity.config.js` - ✅ Environment-aware
 - Schema types defined:
   - `component.js` - ✅ Full component schema
   - `foundation.js` - ✅ Foundations schema
@@ -35,8 +35,8 @@
 - `QUICK_REFERENCE.md` - ✅ Quick setup guide
 - `ENV_CONFIGURATION.md` - ✅ Master env guide
 - `shadcn-showcase/ENV_SETUP.md` - ✅ App-specific guide
-- `studio-group-design-system/ENV_SETUP.md` - ✅ Studio-specific guide
-- `studio-group-design-system/STUDIO_SETUP.md` - ✅ Studio operations
+- `group-design-system/ENV_SETUP.md` - ✅ Studio-specific guide
+- `group-design-system/STUDIO_SETUP.md` - ✅ Studio operations
 
 ## 📋 Code Quality
 - ✅ Error handling in all API routes
