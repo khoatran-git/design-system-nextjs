@@ -1,19 +1,47 @@
 import { client } from '@/lib/sanity.client'
 import { componentBySlugQuery } from '@/lib/sanity.queries'
+import {
+  successResponse,
+  errorResponse,
+  withErrorHandling,
+  getCacheConfig,
+} from '@/lib/api-helpers'
 
-export async function GET(request, { params }) {
+/**
+ * GET /api/components/[slug]
+ * Fetch specific component by slug
+ * 
+ * Parameters:
+ * - slug: Component slug (e.g., "button")
+ * 
+ * Cache: 1 minute (detailed pages refresh frequently during development)
+ */
+export const GET = withErrorHandling(async (request, { params }) => {
   try {
-    if (!client) {
-      return Response.json({ message: 'Sanity not configured yet' }, { status: 200 })
+    const { slug } = params
+
+    if (!slug) {
+      return errorResponse('Slug parameter is required', 400)
     }
-    const component = await client.fetch(componentBySlugQuery, {
-      slug: params.slug,
-    })
+
+    const component = await client.fetch(componentBySlugQuery, { slug })
+
     if (!component) {
-      return Response.json({ error: 'Component not found' }, { status: 404 })
+      return errorResponse('Component not found', 404)
     }
-    return Response.json(component)
+
+    return successResponse(component, {
+      cacheControl: getCacheConfig('detail'),
+      meta: {
+        slug,
+        contentType: 'component-detail',
+      },
+    })
   } catch (error) {
-    return Response.json({ error: 'Failed to fetch component', details: error.message }, { status: 500 })
+    return errorResponse(
+      'Failed to fetch component',
+      500,
+      process.env.NODE_ENV === 'development' ? error.message : undefined
+    )
   }
-}
+})

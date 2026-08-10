@@ -1,14 +1,95 @@
 import { client } from '@/lib/sanity.client'
-import { resourcesQuery } from '@/lib/sanity.queries'
+import { resourcesQuery, resourceBySlugQuery, resourcesByTypeQuery } from '@/lib/sanity.queries'
+import {
+  successResponse,
+  errorResponse,
+  withErrorHandling,
+  getCacheConfig,
+  getQueryParams,
+  validateParams,
+} from '@/lib/api-helpers'
 
-export async function GET() {
+/**
+ * GET /api/resources
+ * Fetch all published resources with optional type filtering
+ * 
+ * Query parameters:
+ * - type (optional): Filter by resource type (link, document, tool, guide)
+ * 
+ * Cache: 1 hour (resources are stable content)
+ */
+export const GET = withErrorHandling(async (request) => {
   try {
-    if (!client) {
-      return Response.json({ message: 'Sanity not configured yet' }, { status: 200 })
+    const params = getQueryParams(request)
+    const { resourceType } = params
+
+    let resources
+
+    if (resourceType) {
+      // Validate resourceType parameter
+      const validation = validateParams(params, ['resourceType'])
+      if (!validation.valid) {
+        return errorResponse('Invalid parameters', 400, validation.errors)
+      }
+
+      const validTypes = ['link', 'document', 'tool', 'guide']
+      if (!validTypes.includes(resourceType)) {
+        return errorResponse(
+          'Invalid resource type',
+          400,
+          `Must be one of: ${validTypes.join(', ')}`
+        )
+      }
+
+      resources = await client.fetch(resourcesByTypeQuery, { resourceType })
+    } else {
+      resources = await client.fetch(resourcesQuery)
     }
-    const resources = await client.fetch(resourcesQuery)
-    return Response.json(resources)
+
+    return successResponse(resources, {
+      cacheControl: getCacheConfig('resources'),
+      meta: {
+        count: resources?.length || 0,
+        contentType: 'resources',
+        ...(resourceType && { resourceType }),
+      },
+    })
   } catch (error) {
-    return Response.json({ error: 'Failed to fetch resources', details: error.message }, { status: 500 })
+    return errorResponse(
+      'Failed to fetch resources',
+      500,
+      process.env.NODE_ENV === 'development' ? error.message : undefined
+    )
+  }
+})
+
+/**
+ * Get resource by slug helper
+ */
+export async function getResourceRoute(slug) {
+  try {
+    if (!slug) {
+      return errorResponse('Slug parameter is required', 400)
+    }
+
+    const resource = await client.fetch(resourceBySlugQuery, { slug })
+
+    if (!resource) {
+      return errorResponse('Resource not found', 404)
+    }
+
+    return successResponse(resource, {
+      cacheControl: getCacheConfig('detail'),
+      meta: {
+        slug,
+        contentType: 'resource',
+      },
+    })
+  } catch (error) {
+    return errorResponse(
+      'Failed to fetch resource',
+      500,
+      process.env.NODE_ENV === 'development' ? error.message : undefined
+    )
   }
 }

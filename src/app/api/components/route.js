@@ -1,14 +1,71 @@
 import { client } from '@/lib/sanity.client'
-import { componentsQuery } from '@/lib/sanity.queries'
+import { componentsQuery, componentBySlugQuery } from '@/lib/sanity.queries'
+import {
+  successResponse,
+  errorResponse,
+  withErrorHandling,
+  getCacheConfig,
+  getQueryParams,
+} from '@/lib/api-helpers'
 
-export async function GET() {
+/**
+ * GET /api/components
+ * Fetch all published components
+ * 
+ * Query parameters:
+ * - limit (optional): Number of results to return
+ * - offset (optional): Number of results to skip
+ * 
+ * Cache: 5 minutes (revalidate frequently during development)
+ */
+export const GET = withErrorHandling(async (request) => {
   try {
-    if (!client) {
-      return Response.json({ message: 'Sanity not configured yet. Update .env.local with your Sanity project ID.' }, { status: 200 })
-    }
     const components = await client.fetch(componentsQuery)
-    return Response.json(components)
+
+    return successResponse(components, {
+      cacheControl: getCacheConfig('components'),
+      meta: {
+        count: components?.length || 0,
+        contentType: 'components',
+      },
+    })
   } catch (error) {
-    return Response.json({ error: 'Failed to fetch components', details: error.message }, { status: 500 })
+    return errorResponse(
+      'Failed to fetch components',
+      500,
+      process.env.NODE_ENV === 'development' ? error.message : undefined
+    )
+  }
+})
+
+/**
+ * GET /api/components/[slug]
+ * Fetch specific component by slug
+ */
+export async function getComponentRoute(slug) {
+  try {
+    if (!slug) {
+      return errorResponse('Slug parameter is required', 400)
+    }
+
+    const component = await client.fetch(componentBySlugQuery, { slug })
+
+    if (!component) {
+      return errorResponse('Component not found', 404)
+    }
+
+    return successResponse(component, {
+      cacheControl: getCacheConfig('detail'),
+      meta: {
+        slug,
+        contentType: 'component',
+      },
+    })
+  } catch (error) {
+    return errorResponse(
+      'Failed to fetch component',
+      500,
+      process.env.NODE_ENV === 'development' ? error.message : undefined
+    )
   }
 }
