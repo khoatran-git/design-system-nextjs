@@ -52,9 +52,26 @@ const COMPONENT_DESCRIPTIONS = {
 export default function Home() {
   const [selectedComponent, setSelectedComponent] = useState('button')
   const [expandedMenu, setExpandedMenu] = useState('components')
+  const [expandedFoundations, setExpandedFoundations] = useState(false)
 
   const component = COMPONENTS.find(c => c.slug === selectedComponent)
   const description = COMPONENT_DESCRIPTIONS[selectedComponent]
+
+  const FOUNDATIONS_ITEMS = [
+    { label: 'Principles', slug: 'principles' },
+    { label: 'Governance', slug: 'governance' },
+  ]
+
+  const DESIGN_SYSTEM_ITEMS = [
+    { label: 'Design tokens', slug: 'design-tokens' },
+    { label: 'Typography', slug: 'typography' },
+    { label: 'Colours', slug: 'colours' },
+    { label: 'Elevation', slug: 'elevation' },
+    { label: 'Motion', slug: 'motion' },
+    { label: 'Usability', slug: 'usability' },
+    { label: 'Accessibility', slug: 'accessibility' },
+    { label: 'UX Writing', slug: 'ux-writing' },
+  ]
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -93,12 +110,45 @@ export default function Home() {
               Get Started
             </button>
 
-            {/* Foundation */}
-            <button
-              className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground active:bg-primary active:text-primary-foreground"
-            >
-              Foundation
-            </button>
+            {/* Foundations (Collapsible) */}
+            <div>
+              <button
+                onClick={() => setExpandedFoundations(expandedFoundations ? false : true)}
+                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+              >
+                <span>Foundations</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedFoundations ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Foundations List (Nested) */}
+              {expandedFoundations && (
+                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                  {FOUNDATIONS_ITEMS.map((item) => (
+                    <button
+                      key={item.slug}
+                      className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                  
+                  {/* Divider */}
+                  <div className="my-2 border-t border-border" />
+                  
+                  {DESIGN_SYSTEM_ITEMS.map((item) => (
+                    <button
+                      key={item.slug}
+                      className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Components (Collapsible) */}
             <div>
