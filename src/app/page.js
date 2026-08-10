@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
+import { ChevronDown } from 'lucide-react'
 
 const COMPONENTS = [
   { name: 'Accordion', slug: 'accordion' },
@@ -65,8 +66,15 @@ const COMPONENT_DESCRIPTIONS = {
   'tooltip': 'A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.',
 }
 
+const MENU_ITEMS = [
+  { label: 'Get Started', section: 'get-started' },
+  { label: 'Foundation', section: 'foundation' },
+  { label: 'Resources', section: 'resources' },
+]
+
 export default function Home() {
   const [selectedComponent, setSelectedComponent] = useState('button')
+  const [expandedMenu, setExpandedMenu] = useState('components')
 
   const component = COMPONENTS.find(c => c.slug === selectedComponent)
   const description = COMPONENT_DESCRIPTIONS[selectedComponent]
@@ -78,8 +86,8 @@ export default function Home() {
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">shadcn/ui</h1>
-              <p className="text-sm text-muted-foreground">Component Documentation</p>
+              <h1 className="text-2xl font-bold tracking-tight">Group Design System</h1>
+              <p className="text-sm text-muted-foreground">The ultimate design system</p>
             </div>
             <div className="flex items-center gap-4">
               <Badge variant="secondary">v1.0</Badge>
@@ -96,24 +104,63 @@ export default function Home() {
         {/* Left Sidebar */}
         <aside className="w-64 border-r bg-muted/30 overflow-y-auto">
           <div className="sticky top-0 p-4 border-b bg-background">
-            <h2 className="text-sm font-semibold">Components</h2>
-            <p className="text-xs text-muted-foreground mt-1">27 components</p>
+            <h2 className="text-sm font-semibold">Menu</h2>
           </div>
           
-          <nav className="p-4 space-y-1">
-            {COMPONENTS.map((comp) => (
+          <nav className="p-4 space-y-2">
+            {/* Get Started */}
+            <button
+              className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent text-foreground"
+            >
+              Get Started
+            </button>
+
+            {/* Foundation */}
+            <button
+              className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent text-foreground"
+            >
+              Foundation
+            </button>
+
+            {/* Components (Collapsible) */}
+            <div>
               <button
-                key={comp.slug}
-                onClick={() => setSelectedComponent(comp.slug)}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                  selectedComponent === comp.slug
-                    ? 'bg-primary text-primary-foreground font-medium'
-                    : 'hover:bg-accent text-foreground'
-                }`}
+                onClick={() => setExpandedMenu(expandedMenu === 'components' ? null : 'components')}
+                className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent text-foreground flex items-center justify-between"
               >
-                {comp.name}
+                <span>Components</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
+                />
               </button>
-            ))}
+
+              {/* Components List (Nested) */}
+              {expandedMenu === 'components' && (
+                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                  {COMPONENTS.map((comp) => (
+                    <button
+                      key={comp.slug}
+                      onClick={() => setSelectedComponent(comp.slug)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                        selectedComponent === comp.slug
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'hover:bg-accent text-foreground'
+                      }`}
+                    >
+                      {comp.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Resources */}
+            <button
+              className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent text-foreground"
+            >
+              Resources
+            </button>
           </nav>
         </aside>
 
