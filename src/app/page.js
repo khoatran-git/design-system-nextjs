@@ -6,71 +6,48 @@ import { Badge } from '../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { ChevronDown } from 'lucide-react'
 
+// Free version components from shadcncraft
 const COMPONENTS = [
-  { name: 'Accordion', slug: 'accordion' },
   { name: 'Alert', slug: 'alert' },
-  { name: 'Alert Dialog', slug: 'alert-dialog' },
   { name: 'Avatar', slug: 'avatar' },
   { name: 'Badge', slug: 'badge' },
   { name: 'Button', slug: 'button' },
   { name: 'Card', slug: 'card' },
   { name: 'Checkbox', slug: 'checkbox' },
-  { name: 'Collapsible', slug: 'collapsible' },
-  { name: 'Command', slug: 'command' },
   { name: 'Dialog', slug: 'dialog' },
-  { name: 'Dropdown Menu', slug: 'dropdown-menu' },
-  { name: 'Hover Card', slug: 'hover-card' },
   { name: 'Input', slug: 'input' },
   { name: 'Label', slug: 'label' },
   { name: 'Progress', slug: 'progress' },
   { name: 'Radio Group', slug: 'radio-group' },
-  { name: 'Scroll Area', slug: 'scroll-area' },
   { name: 'Select', slug: 'select' },
   { name: 'Separator', slug: 'separator' },
-  { name: 'Slider', slug: 'slider' },
   { name: 'Switch', slug: 'switch' },
   { name: 'Tabs', slug: 'tabs' },
   { name: 'Textarea', slug: 'textarea' },
-  { name: 'Toast', slug: 'toast' },
   { name: 'Toggle', slug: 'toggle' },
   { name: 'Tooltip', slug: 'tooltip' },
 ]
 
 const COMPONENT_DESCRIPTIONS = {
-  'accordion': 'A vertically stacked set of interactive headings that each reveal a section of content.',
   'alert': 'Displays a callout for user attention.',
-  'alert-dialog': 'A dialog that interrupts the user with important content and expects a response.',
   'avatar': 'An image element with a fallback for representing the user.',
   'badge': 'Displays a small, self-contained piece of information.',
   'button': 'Triggers an action or event, such as submitting a form or displaying a dialog.',
   'card': 'Displays content within a contained format.',
   'checkbox': 'A control that allows the user to toggle between checked and not checked.',
-  'collapsible': 'An interactive component for showing and hiding content.',
-  'command': 'Fast, composable, unstyled command menu with a search.',
   'dialog': 'A window overlaid on either the primary window or another dialog window.',
-  'dropdown-menu': 'Displays a menu to the user — such as a set of actions or functions.',
-  'hover-card': 'For sighted users to preview content available behind a link.',
   'input': 'Displays a form input field or filter.',
   'label': 'Renders an accessible label associated with controls.',
   'progress': 'Displays an indicator showing the completion progress of a task.',
   'radio-group': 'A set of checkable buttons, known as radio buttons, where no more than one can be checked at a time.',
-  'scroll-area': 'Augments native scroll functionality for custom, cross-browser styling.',
   'select': 'Displays a list of options for the user to pick from — triggered by a button.',
   'separator': 'Visually or semantically separates content.',
-  'slider': 'An input where the user selects a value from within a given range.',
   'switch': 'A control that allows the user to toggle between checked and unchecked states.',
   'tabs': 'A set of layered sections of content — known as tab panels — that are displayed one at a time.',
   'textarea': 'Displays a form textarea or a place to accept multiple lines of text from the user.',
-  'toast': 'A succinct message that is displayed temporarily.',
   'toggle': 'A two-state button that can be either on or off.',
   'tooltip': 'A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.',
 }
-
-const MENU_ITEMS = [
-  { label: 'Get Started', section: 'get-started' },
-  { label: 'Foundation', section: 'foundation' },
-  { label: 'Resources', section: 'resources' },
-]
 
 export default function Home() {
   const [selectedComponent, setSelectedComponent] = useState('button')
@@ -101,23 +78,24 @@ export default function Home() {
 
       {/* Main Layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar */}
-        <aside className="w-64 border-r bg-muted/30 overflow-y-auto">
-          <div className="sticky top-0 p-4 border-b bg-background">
+        {/* Left Sidebar - Independently Scrollable */}
+        <aside className="w-64 border-r bg-muted/30 flex flex-col overflow-hidden">
+          <div className="p-4 border-b bg-background flex-shrink-0">
             <h2 className="text-sm font-semibold">Menu</h2>
           </div>
           
-          <nav className="p-4 space-y-2">
+          {/* Scrollable Navigation */}
+          <nav className="p-4 space-y-2 overflow-y-auto flex-1">
             {/* Get Started */}
             <button
-              className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent text-foreground"
+              className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground active:bg-primary active:text-primary-foreground"
             >
               Get Started
             </button>
 
             {/* Foundation */}
             <button
-              className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent text-foreground"
+              className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground active:bg-primary active:text-primary-foreground"
             >
               Foundation
             </button>
@@ -126,12 +104,12 @@ export default function Home() {
             <div>
               <button
                 onClick={() => setExpandedMenu(expandedMenu === 'components' ? null : 'components')}
-                className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent text-foreground flex items-center justify-between"
+                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
               >
                 <span>Components</span>
                 <ChevronDown 
                   size={16} 
-                  className={`transition-transform ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
+                  className={`transition-transform duration-200 ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
                 />
               </button>
 
@@ -142,10 +120,10 @@ export default function Home() {
                     <button
                       key={comp.slug}
                       onClick={() => setSelectedComponent(comp.slug)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
                         selectedComponent === comp.slug
                           ? 'bg-primary text-primary-foreground font-medium'
-                          : 'hover:bg-accent text-foreground'
+                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
                       }`}
                     >
                       {comp.name}
@@ -157,14 +135,14 @@ export default function Home() {
 
             {/* Resources */}
             <button
-              className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent text-foreground"
+              className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground active:bg-primary active:text-primary-foreground"
             >
               Resources
             </button>
           </nav>
         </aside>
 
-        {/* Main Content Area */}
+        {/* Main Content Area - Independently Scrollable */}
         <main className="flex-1 overflow-y-auto">
           {component && (
             <div className="min-h-full">
