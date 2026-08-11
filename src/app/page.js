@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
@@ -8,7 +9,9 @@ import { ChevronDown } from 'lucide-react'
 import SimpleContentRenderer from '../components/PortableTextComponents'
 
 export default function Home() {
+  const router = useRouter()
   const [components, setComponents] = useState([])
+  const [foundations, setFoundations] = useState([])
   const [categories, setCategories] = useState([])
   const [selectedComponent, setSelectedComponent] = useState(null)
   const [expandedMenu, setExpandedMenu] = useState('components')
@@ -20,15 +23,17 @@ export default function Home() {
     const fetchData = async () => {
       try {
         // Use API endpoints instead of direct Sanity calls
-        const [componentsResponse, categoriesResponse] = await Promise.all([
+        const [componentsResponse, foundationsResponse] = await Promise.all([
           fetch('/api/components'),
-          fetch('/api/components') // We'll get categories from components data
+          fetch('/api/foundations')
         ])
         
         const componentsData = await componentsResponse.json()
+        const foundationsData = await foundationsResponse.json()
         
         // Extract components from API response
         const components = componentsData.data || []
+        const foundations = foundationsData.data || []
         
         // Extract unique categories from components
         const uniqueCategories = [...new Set(
@@ -38,6 +43,7 @@ export default function Home() {
         )]
         
         setComponents(components)
+        setFoundations(foundations)
         setCategories(uniqueCategories.map(cat => ({ category: cat })))
         
         // Set first component as selected by default
@@ -143,26 +149,21 @@ export default function Home() {
               {/* Foundations List (Nested) */}
               {expandedFoundations && (
                 <div className="pl-4 mt-1 space-y-1 border-l border-border">
-                  {FOUNDATIONS_ITEMS.map((item) => (
+                  {foundations.map((foundation) => (
                     <button
-                      key={item.slug}
+                      key={foundation.slug.current}
+                      onClick={() => router.push(`/foundations/${foundation.slug.current}`)}
                       className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
-                      {item.label}
+                      {foundation.title}
                     </button>
                   ))}
                   
-                  {/* Divider */}
-                  <div className="my-2 border-t border-border" />
-                  
-                  {DESIGN_SYSTEM_ITEMS.map((item) => (
-                    <button
-                      key={item.slug}
-                      className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
-                    >
-                      {item.label}
-                    </button>
-                  ))}
+                  {foundations.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No foundations found. Add some in your Sanity Studio!
+                    </div>
+                  )}
                 </div>
               )}
             </div>
