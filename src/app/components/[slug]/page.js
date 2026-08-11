@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { sanityFetch } from '../../../../lib/sanity.client'
-import { componentBySlugQuery } from '../../../../lib/sanity.queries'
 import { Button } from '../../../components/ui/button'
 import { Badge } from '../../../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
@@ -23,10 +21,12 @@ export default function ComponentPage() {
 
       try {
         setLoading(true)
-        const data = await sanityFetch(componentBySlugQuery, { slug: params.slug })
+        // Use API endpoint instead of direct Sanity call
+        const response = await fetch(`/api/components/${params.slug}`)
+        const result = await response.json()
         
-        if (data) {
-          setComponent(data)
+        if (result.data) {
+          setComponent(result.data)
         } else {
           setError('Component not found')
         }
@@ -111,25 +111,26 @@ export default function ComponentPage() {
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="content" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 max-w-lg">
-              <TabsTrigger value="content">Content</TabsTrigger>
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 max-w-lg">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="meta">Meta</TabsTrigger>
+              <TabsTrigger value="code">Code</TabsTrigger>
+              <TabsTrigger value="whats-new">What's new</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="content" className="mt-8">
+            <TabsContent value="overview" className="mt-8">
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-semibold mb-4">Rich Content</h2>
+                  <h2 className="text-2xl font-semibold mb-4">Overview</h2>
                   {component.content && component.content.length > 0 ? (
-                    <SimpleContentRenderer content={component.content} />
+                    <div className="prose prose-gray dark:prose-invert max-w-none">
+                      <SimpleContentRenderer content={component.content} />
+                    </div>
                   ) : (
                     <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
-                      <p className="text-muted-foreground">No rich content available</p>
+                      <p className="text-muted-foreground">No overview content available</p>
                       <p className="text-sm text-muted-foreground mt-2">
-                        Add content in your Sanity Studio to see it here
+                        Add rich content in your Sanity Studio to see it here
                       </p>
                     </div>
                   )}
@@ -137,75 +138,33 @@ export default function ComponentPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="overview" className="mt-8">
+            <TabsContent value="code" className="mt-8">
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-semibold mb-4">Component Overview</h2>
-                  {component.description ? (
-                    <div className="prose prose-neutral dark:prose-invert max-w-none">
-                      <p className="text-lg leading-relaxed">{component.description}</p>
-                    </div>
-                  ) : (
-                    <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
-                      <p className="text-muted-foreground">No description available</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="details" className="mt-8">
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-2xl font-semibold mb-4">Component Details</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-6 border rounded-lg">
-                      <h3 className="font-semibold text-sm mb-2 text-muted-foreground uppercase tracking-wide">Title</h3>
-                      <p className="text-lg">{component.title}</p>
-                    </div>
-                    
-                    <div className="p-6 border rounded-lg">
-                      <h3 className="font-semibold text-sm mb-2 text-muted-foreground uppercase tracking-wide">Category</h3>
-                      <p className="text-lg">{component.category || 'Uncategorized'}</p>
-                    </div>
-                    
-                    <div className="p-6 border rounded-lg">
-                      <h3 className="font-semibold text-sm mb-2 text-muted-foreground uppercase tracking-wide">Status</h3>
-                      <Badge variant={component.status === 'published' ? 'default' : 'secondary'} className="text-sm">
-                        {component.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="p-6 border rounded-lg">
-                      <h3 className="font-semibold text-sm mb-2 text-muted-foreground uppercase tracking-wide">URL Slug</h3>
-                      <p className="text-lg font-mono">{component.slug?.current || 'No slug'}</p>
-                    </div>
+                  <h2 className="text-2xl font-semibold mb-4">Code Examples</h2>
+                  <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
+                    <p className="text-muted-foreground">Code examples will be displayed here</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Add code blocks in your Sanity Studio content to show examples
+                    </p>
                   </div>
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="meta" className="mt-8">
+            <TabsContent value="whats-new" className="mt-8">
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-semibold mb-4">Metadata</h2>
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="p-6 border rounded-lg">
-                      <h3 className="font-semibold text-sm mb-2 text-muted-foreground uppercase tracking-wide">Document ID</h3>
-                      <p className="text-sm font-mono">{component._id}</p>
-                    </div>
-                    
-                    <div className="p-6 border rounded-lg">
-                      <h3 className="font-semibold text-sm mb-2 text-muted-foreground uppercase tracking-wide">Created</h3>
-                      <p className="text-sm">
-                        {component._createdAt 
-                          ? new Date(component._createdAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })
+                  <h2 className="text-2xl font-semibold mb-4">What's New</h2>
+                  <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
+                    <div className="space-y-3">
+                      <p className="text-muted-foreground font-medium">No recent updates</p>
+                      <p className="text-sm text-muted-foreground">
+                        Component changelog and recent updates will appear here
+                      </p>
+                      <p className="text-xs text-muted-foreground/60">
+                        Last updated: {component._createdAt 
+                          ? new Date(component._createdAt).toLocaleDateString()
                           : 'Unknown'
                         }
                       </p>

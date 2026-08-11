@@ -247,61 +247,42 @@ export default function Home() {
                 <Tabs defaultValue="overview" className="w-full">
                   <TabsList className="grid w-full grid-cols-3 max-w-md">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="content">Content</TabsTrigger>
-                    <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="code">Code</TabsTrigger>
+                    <TabsTrigger value="whats-new">What's new</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="overview" className="mt-6">
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <h3 className="text-lg font-semibold">Overview</h3>
-                      {selectedComponent.description ? (
-                        <p className="text-muted-foreground leading-relaxed">
-                          {selectedComponent.description}
-                        </p>
-                      ) : (
-                        <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                          No overview content available
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="content" className="mt-6">
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Rich Content</h3>
                       {selectedComponent.content && selectedComponent.content.length > 0 ? (
-                        <SimpleContentRenderer content={selectedComponent.content} />
+                        <div className="prose prose-gray max-w-none">
+                          <SimpleContentRenderer content={selectedComponent.content} />
+                        </div>
                       ) : (
                         <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                          No content available. Add some rich content in your Sanity Studio!
+                          No overview content available. Add rich content in your Sanity Studio to get started!
                         </div>
                       )}
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="details" className="mt-6">
+                  <TabsContent value="code" className="mt-6">
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Component Details</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 border rounded-lg">
-                          <h4 className="font-semibold text-sm mb-2">Title</h4>
-                          <p className="text-sm text-muted-foreground">{selectedComponent.title}</p>
-                        </div>
-                        <div className="p-4 border rounded-lg">
-                          <h4 className="font-semibold text-sm mb-2">Category</h4>
-                          <p className="text-sm text-muted-foreground">{selectedComponent.category || 'Uncategorized'}</p>
-                        </div>
-                        <div className="p-4 border rounded-lg">
-                          <h4 className="font-semibold text-sm mb-2">Status</h4>
-                          <Badge variant={selectedComponent.status === 'published' ? 'default' : 'secondary'}>
-                            {selectedComponent.status}
-                          </Badge>
-                        </div>
-                        <div className="p-4 border rounded-lg">
-                          <h4 className="font-semibold text-sm mb-2">Slug</h4>
-                          <p className="text-sm text-muted-foreground font-mono">
-                            {selectedComponent.slug?.current || 'No slug'}
-                          </p>
+                      <h3 className="text-lg font-semibold">Code Examples</h3>
+                      <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                        Code examples will be displayed here. Add code blocks in your Sanity Studio content to show examples!
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="whats-new" className="mt-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">What's New</h3>
+                      <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                        <div className="space-y-2">
+                          <p className="font-medium">No recent updates</p>
+                          <p className="text-sm">Component changelog and recent updates will appear here.</p>
+                          <p className="text-xs text-muted-foreground/60">Last updated: {selectedComponent._createdAt ? new Date(selectedComponent._createdAt).toLocaleDateString() : 'Unknown'}</p>
                         </div>
                       </div>
                     </div>
