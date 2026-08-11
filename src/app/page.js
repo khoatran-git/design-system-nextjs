@@ -1,61 +1,47 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { sanityFetch } from '../../lib/sanity.client'
+import { componentsQuery, componentsMinimalQuery, categoriesQuery } from '../../lib/sanity.queries'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { ChevronDown } from 'lucide-react'
-
-// Free version components from shadcncraft
-const COMPONENTS = [
-  { name: 'Alert', slug: 'alert' },
-  { name: 'Avatar', slug: 'avatar' },
-  { name: 'Badge', slug: 'badge' },
-  { name: 'Button', slug: 'button' },
-  { name: 'Card', slug: 'card' },
-  { name: 'Checkbox', slug: 'checkbox' },
-  { name: 'Dialog', slug: 'dialog' },
-  { name: 'Input', slug: 'input' },
-  { name: 'Label', slug: 'label' },
-  { name: 'Progress', slug: 'progress' },
-  { name: 'Radio Group', slug: 'radio-group' },
-  { name: 'Select', slug: 'select' },
-  { name: 'Separator', slug: 'separator' },
-  { name: 'Switch', slug: 'switch' },
-  { name: 'Tabs', slug: 'tabs' },
-  { name: 'Textarea', slug: 'textarea' },
-  { name: 'Toggle', slug: 'toggle' },
-  { name: 'Tooltip', slug: 'tooltip' },
-]
-
-const COMPONENT_DESCRIPTIONS = {
-  'alert': 'Displays a callout for user attention.',
-  'avatar': 'An image element with a fallback for representing the user.',
-  'badge': 'Displays a small, self-contained piece of information.',
-  'button': 'Triggers an action or event, such as submitting a form or displaying a dialog.',
-  'card': 'Displays content within a contained format.',
-  'checkbox': 'A control that allows the user to toggle between checked and not checked.',
-  'dialog': 'A window overlaid on either the primary window or another dialog window.',
-  'input': 'Displays a form input field or filter.',
-  'label': 'Renders an accessible label associated with controls.',
-  'progress': 'Displays an indicator showing the completion progress of a task.',
-  'radio-group': 'A set of checkable buttons, known as radio buttons, where no more than one can be checked at a time.',
-  'select': 'Displays a list of options for the user to pick from — triggered by a button.',
-  'separator': 'Visually or semantically separates content.',
-  'switch': 'A control that allows the user to toggle between checked and unchecked states.',
-  'tabs': 'A set of layered sections of content — known as tab panels — that are displayed one at a time.',
-  'textarea': 'Displays a form textarea or a place to accept multiple lines of text from the user.',
-  'toggle': 'A two-state button that can be either on or off.',
-  'tooltip': 'A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.',
-}
+import PortableTextRenderer from '../components/PortableTextComponents'
 
 export default function Home() {
-  const [selectedComponent, setSelectedComponent] = useState('button')
+  const [components, setComponents] = useState([])
+  const [categories, setCategories] = useState([])
+  const [selectedComponent, setSelectedComponent] = useState(null)
   const [expandedMenu, setExpandedMenu] = useState('components')
   const [expandedFoundations, setExpandedFoundations] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  const component = COMPONENTS.find(c => c.slug === selectedComponent)
-  const description = COMPONENT_DESCRIPTIONS[selectedComponent]
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [componentsData, categoriesData] = await Promise.all([
+          sanityFetch(componentsQuery),
+          sanityFetch(categoriesQuery)
+        ])
+        
+        setComponents(componentsData || [])
+        setCategories(categoriesData || [])
+        
+        // Set first component as selected by default
+        if (componentsData && componentsData.length > 0) {
+          setSelectedComponent(componentsData[0])
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   const FOUNDATIONS_ITEMS = [
     { label: 'Principles', slug: 'principles' },
@@ -73,6 +59,25 @@ export default function Home() {
     { label: 'UX Writing', slug: 'ux-writing' },
   ]
 
+  // Group components by category
+  const componentsByCategory = components.reduce((acc, component) => {
+    const category = component.category || 'Uncategorized'
+    if (!acc[category]) acc[category] = []
+    acc[category].push(component)
+    return acc
+  }, {})
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading design system...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Header */}
@@ -85,7 +90,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-4">
               <Badge variant="secondary">v1.0</Badge>
-              <a href="https://github.com/khoatran-git/design-system" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/khoatran-git/design-system-nextjs" target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="sm">GitHub</Button>
               </a>
             </div>
@@ -113,7 +118,7 @@ export default function Home() {
             {/* Foundations (Collapsible) */}
             <div>
               <button
-                onClick={() => setExpandedFoundations(expandedFoundations ? false : true)}
+                onClick={() => setExpandedFoundations(!expandedFoundations)}
                 className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
               >
                 <span>Foundations</span>
@@ -156,7 +161,7 @@ export default function Home() {
                 onClick={() => setExpandedMenu(expandedMenu === 'components' ? null : 'components')}
                 className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
               >
-                <span>Components</span>
+                <span>Components ({components.length})</span>
                 <ChevronDown 
                   size={16} 
                   className={`transition-transform duration-200 ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
@@ -166,19 +171,32 @@ export default function Home() {
               {/* Components List (Nested) */}
               {expandedMenu === 'components' && (
                 <div className="pl-4 mt-1 space-y-1 border-l border-border">
-                  {COMPONENTS.map((comp) => (
-                    <button
-                      key={comp.slug}
-                      onClick={() => setSelectedComponent(comp.slug)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
-                        selectedComponent === comp.slug
-                          ? 'bg-primary text-primary-foreground font-medium'
-                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                      }`}
-                    >
-                      {comp.name}
-                    </button>
+                  {Object.entries(componentsByCategory).map(([category, categoryComponents]) => (
+                    <div key={category}>
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1">
+                        {category}
+                      </div>
+                      {categoryComponents.map((comp) => (
+                        <button
+                          key={comp._id}
+                          onClick={() => setSelectedComponent(comp)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                            selectedComponent?._id === comp._id
+                              ? 'bg-primary text-primary-foreground font-medium'
+                              : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                          }`}
+                        >
+                          {comp.title}
+                        </button>
+                      ))}
+                    </div>
                   ))}
+                  
+                  {components.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No components found. Add some in your Sanity Studio!
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -194,18 +212,19 @@ export default function Home() {
 
         {/* Main Content Area - Independently Scrollable */}
         <main className="flex-1 overflow-y-auto">
-          {component && (
+          {selectedComponent ? (
             <div className="min-h-full">
               {/* Banner Section */}
               <div className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
                 <div className="px-8 py-12">
                   <div className="max-w-4xl">
                     <div className="flex items-center gap-3 mb-4">
-                      <h1 className="text-4xl font-bold tracking-tight">{component.name}</h1>
-                      <Badge>{component.slug}</Badge>
+                      <h1 className="text-4xl font-bold tracking-tight">{selectedComponent.title}</h1>
+                      <Badge>{selectedComponent.category || 'Component'}</Badge>
+                      <Badge variant="outline">{selectedComponent.status}</Badge>
                     </div>
                     <p className="text-lg text-muted-foreground max-w-2xl">
-                      {description}
+                      {selectedComponent.description || 'No description provided'}
                     </p>
                   </div>
                 </div>
@@ -216,33 +235,62 @@ export default function Home() {
                 <Tabs defaultValue="overview" className="w-full">
                   <TabsList className="grid w-full grid-cols-3 max-w-md">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="specs">Specs</TabsTrigger>
-                    <TabsTrigger value="documentation">Documentation</TabsTrigger>
+                    <TabsTrigger value="content">Content</TabsTrigger>
+                    <TabsTrigger value="details">Details</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="overview" className="mt-6">
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Overview</h3>
-                      <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                        Overview content coming soon...
-                      </div>
+                      {selectedComponent.description ? (
+                        <p className="text-muted-foreground leading-relaxed">
+                          {selectedComponent.description}
+                        </p>
+                      ) : (
+                        <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                          No overview content available
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="specs" className="mt-6">
+                  <TabsContent value="content" className="mt-6">
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Specifications</h3>
-                      <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                        Specifications content coming soon...
-                      </div>
+                      <h3 className="text-lg font-semibold">Rich Content</h3>
+                      {selectedComponent.content && selectedComponent.content.length > 0 ? (
+                        <PortableTextRenderer content={selectedComponent.content} />
+                      ) : (
+                        <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                          No content available. Add some rich content in your Sanity Studio!
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="documentation" className="mt-6">
+                  <TabsContent value="details" className="mt-6">
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Documentation</h3>
-                      <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                        Documentation content coming soon...
+                      <h3 className="text-lg font-semibold">Component Details</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 border rounded-lg">
+                          <h4 className="font-semibold text-sm mb-2">Title</h4>
+                          <p className="text-sm text-muted-foreground">{selectedComponent.title}</p>
+                        </div>
+                        <div className="p-4 border rounded-lg">
+                          <h4 className="font-semibold text-sm mb-2">Category</h4>
+                          <p className="text-sm text-muted-foreground">{selectedComponent.category || 'Uncategorized'}</p>
+                        </div>
+                        <div className="p-4 border rounded-lg">
+                          <h4 className="font-semibold text-sm mb-2">Status</h4>
+                          <Badge variant={selectedComponent.status === 'published' ? 'default' : 'secondary'}>
+                            {selectedComponent.status}
+                          </Badge>
+                        </div>
+                        <div className="p-4 border rounded-lg">
+                          <h4 className="font-semibold text-sm mb-2">Slug</h4>
+                          <p className="text-sm text-muted-foreground font-mono">
+                            {selectedComponent.slug?.current || 'No slug'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </TabsContent>
@@ -250,21 +298,31 @@ export default function Home() {
 
                 {/* Footer Info */}
                 <div className="mt-12 pt-8 border-t">
-                  <div className="grid grid-cols-3 gap-8 text-sm">
-                    <div>
-                      <h4 className="font-semibold mb-2">Component</h4>
-                      <p className="text-muted-foreground">{component.name}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold mb-2">Slug</h4>
-                      <p className="text-muted-foreground">{component.slug}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold mb-2">Status</h4>
-                      <p className="text-muted-foreground">Available</p>
-                    </div>
+                  <div className="text-center text-sm text-muted-foreground">
+                    <p>Last updated: {selectedComponent._createdAt ? new Date(selectedComponent._createdAt).toLocaleDateString() : 'Unknown'}</p>
                   </div>
                 </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold mb-4">Welcome to Group Design System</h2>
+                <p className="text-muted-foreground mb-6 max-w-md">
+                  {components.length > 0 
+                    ? 'Select a component from the sidebar to get started.' 
+                    : 'No components found. Add some components in your Sanity Studio to get started!'
+                  }
+                </p>
+                {components.length === 0 && (
+                  <a 
+                    href="https://design-system-sanity.vercel.app" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <Button>Open Sanity Studio</Button>
+                  </a>
+                )}
               </div>
             </div>
           )}
