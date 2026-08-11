@@ -9,7 +9,7 @@ import { Button } from '../../../components/ui/button'
 import { Badge } from '../../../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
 import { ArrowLeft } from 'lucide-react'
-import PortableTextRenderer from '../../../components/PortableTextComponents'
+import SimpleContentRenderer from '../../../components/PortableTextComponents'
 
 export default function ComponentPage() {
   const params = useParams()
@@ -124,7 +124,7 @@ export default function ComponentPage() {
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">Rich Content</h2>
                   {component.content && component.content.length > 0 ? (
-                    <PortableTextRenderer content={component.content} />
+                    <SimpleContentRenderer content={component.content} />
                   ) : (
                     <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
                       <p className="text-muted-foreground">No rich content available</p>

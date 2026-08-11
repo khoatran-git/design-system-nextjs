@@ -1,4 +1,5 @@
-import { PortableText } from '@portabletext/react'
+// Simple content renderer without @portabletext/react dependency
+// This avoids React version conflicts during build
 
 // Component for rendering code blocks
 const CodeBlock = ({ node }) => {
@@ -93,69 +94,74 @@ const DesignTokens = ({ node }) => {
   )
 }
 
-// Custom components for Portable Text
-export const portableTextComponents = {
-  types: {
-    codeBlock: ({ value }) => <CodeBlock node={value} />,
-    componentPreview: ({ value }) => <ComponentPreview node={value} />,
-    designTokens: ({ value }) => <DesignTokens node={value} />,
-    image: ({ value }) => (
-      <div className="my-6">
-        <img
-          src={value.asset?.url}
-          alt={value.alt || ''}
-          className="max-w-full h-auto rounded-lg border"
-        />
-        {value.caption && (
-          <p className="text-sm text-muted-foreground text-center mt-2">
-            {value.caption}
-          </p>
-        )}
-      </div>
-    ),
-  },
-  marks: {
-    link: ({ children, value }) => (
-      <a
-        href={value.href}
-        target={value.blank ? '_blank' : '_self'}
-        rel={value.blank ? 'noopener noreferrer' : undefined}
-        className="text-primary underline hover:no-underline"
-      >
-        {children}
-      </a>
-    ),
-    code: ({ children }) => (
-      <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono">
-        {children}
-      </code>
-    ),
-  },
-  block: {
-    h1: ({ children }) => <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>,
-    h2: ({ children }) => <h2 className="text-2xl font-semibold mt-6 mb-3">{children}</h2>,
-    h3: ({ children }) => <h3 className="text-xl font-semibold mt-4 mb-2">{children}</h3>,
-    h4: ({ children }) => <h4 className="text-lg font-semibold mt-3 mb-2">{children}</h4>,
-    blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-primary/20 pl-4 my-4 italic text-muted-foreground">
-        {children}
-      </blockquote>
-    ),
-    normal: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
-  },
-  list: {
-    bullet: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
-    number: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
-  },
-  listItem: {
-    bullet: ({ children }) => <li>{children}</li>,
-    number: ({ children }) => <li>{children}</li>,
-  },
+// Simple block renderer for basic content
+const renderBlock = (block) => {
+  if (!block || typeof block !== 'object') {
+    return null
+  }
+
+  // Handle different block types
+  switch (block._type) {
+    case 'block':
+      const style = block.style || 'normal'
+      const text = block.children?.map(child => child.text).join('') || ''
+      
+      switch (style) {
+        case 'h1':
+          return <h1 key={block._key} className="text-3xl font-bold mt-8 mb-4">{text}</h1>
+        case 'h2':
+          return <h2 key={block._key} className="text-2xl font-semibold mt-6 mb-3">{text}</h2>
+        case 'h3':
+          return <h3 key={block._key} className="text-xl font-semibold mt-4 mb-2">{text}</h3>
+        case 'h4':
+          return <h4 key={block._key} className="text-lg font-semibold mt-3 mb-2">{text}</h4>
+        case 'blockquote':
+          return (
+            <blockquote key={block._key} className="border-l-4 border-primary/20 pl-4 my-4 italic text-muted-foreground">
+              {text}
+            </blockquote>
+          )
+        default:
+          return <p key={block._key} className="mb-4 leading-relaxed">{text}</p>
+      }
+    
+    case 'codeBlock':
+      return <CodeBlock key={block._key} node={block} />
+    
+    case 'componentPreview':
+      return <ComponentPreview key={block._key} node={block} />
+    
+    case 'designTokens':
+      return <DesignTokens key={block._key} node={block} />
+    
+    case 'image':
+      return (
+        <div key={block._key} className="my-6">
+          <img
+            src={block.asset?.url}
+            alt={block.alt || ''}
+            className="max-w-full h-auto rounded-lg border"
+          />
+          {block.caption && (
+            <p className="text-sm text-muted-foreground text-center mt-2">
+              {block.caption}
+            </p>
+          )}
+        </div>
+      )
+    
+    default:
+      // Fallback for unknown types
+      if (typeof block === 'string') {
+        return <p key={Math.random()} className="mb-4">{block}</p>
+      }
+      return null
+  }
 }
 
-// Main component for rendering Portable Text content
-export default function PortableTextRenderer({ content }) {
-  if (!content) {
+// Main component for rendering content without PortableText dependency
+export default function SimpleContentRenderer({ content }) {
+  if (!content || !Array.isArray(content) || content.length === 0) {
     return (
       <div className="text-muted-foreground text-center py-8">
         No content available
@@ -165,7 +171,7 @@ export default function PortableTextRenderer({ content }) {
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
-      <PortableText value={content} components={portableTextComponents} />
+      {content.map((block, index) => renderBlock(block))}
     </div>
   )
 }

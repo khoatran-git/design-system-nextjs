@@ -7,7 +7,7 @@ import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { ChevronDown } from 'lucide-react'
-import PortableTextRenderer from '../components/PortableTextComponents'
+import SimpleContentRenderer from '../components/PortableTextComponents'
 
 export default function Home() {
   const [components, setComponents] = useState([])
@@ -258,7 +258,7 @@ export default function Home() {
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Rich Content</h3>
                       {selectedComponent.content && selectedComponent.content.length > 0 ? (
-                        <PortableTextRenderer content={selectedComponent.content} />
+                        <SimpleContentRenderer content={selectedComponent.content} />
                       ) : (
                         <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
                           No content available. Add some rich content in your Sanity Studio!
