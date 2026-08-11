@@ -1,5 +1,5 @@
-import { client } from '../../../lib/sanity.client'
-import { resourcesQuery, resourceBySlugQuery, resourcesByTypeQuery } from '../../../lib/sanity.queries'
+import { client } from '@/lib/sanity.client'
+import { resourcesQuery, resourceBySlugQuery, resourcesByTypeQuery } from '@/lib/sanity.queries'
 import {
   successResponse,
   errorResponse,
@@ -7,7 +7,7 @@ import {
   getCacheConfig,
   getQueryParams,
   validateParams,
-} from '../../../lib/api-helpers'
+} from '@/lib/api-helpers'
 
 /**
  * GET /api/resources

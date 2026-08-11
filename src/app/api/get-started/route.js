@@ -1,12 +1,12 @@
-import { client } from '../../../lib/sanity.client'
-import { getStartedQuery, getStartedBySlugQuery } from '../../../lib/sanity.queries'
+import { client } from '@/lib/sanity.client'
+import { getStartedQuery, getStartedBySlugQuery } from '@/lib/sanity.queries'
 import {
   successResponse,
   errorResponse,
   withErrorHandling,
   getCacheConfig,
   getQueryParams,
-} from '../../../lib/api-helpers'
+} from '@/lib/api-helpers'
 
 /**
  * GET /api/get-started
