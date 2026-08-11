@@ -122,15 +122,15 @@ export default function ComponentPage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">Overview</h2>
-                  {component.content && component.content.length > 0 ? (
+                  {component.overviewContent && component.overviewContent.length > 0 ? (
                     <div className="prose prose-gray dark:prose-invert max-w-none">
-                      <SimpleContentRenderer content={component.content} />
+                      <SimpleContentRenderer content={component.overviewContent} />
                     </div>
                   ) : (
                     <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
                       <p className="text-muted-foreground">No overview content available</p>
                       <p className="text-sm text-muted-foreground mt-2">
-                        Add rich content in your Sanity Studio to see it here
+                        Add overview content in your Sanity Studio to see it here
                       </p>
                     </div>
                   )}
@@ -142,12 +142,18 @@ export default function ComponentPage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">Code Examples</h2>
-                  <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
-                    <p className="text-muted-foreground">Code examples will be displayed here</p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Add code blocks in your Sanity Studio content to show examples
-                    </p>
-                  </div>
+                  {component.codeContent && component.codeContent.length > 0 ? (
+                    <div className="prose prose-gray dark:prose-invert max-w-none">
+                      <SimpleContentRenderer content={component.codeContent} />
+                    </div>
+                  ) : (
+                    <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
+                      <p className="text-muted-foreground">No code examples available</p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Add code examples in your Sanity Studio to see them here
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>
@@ -156,20 +162,26 @@ export default function ComponentPage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">What's New</h2>
-                  <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
-                    <div className="space-y-3">
-                      <p className="text-muted-foreground font-medium">No recent updates</p>
-                      <p className="text-sm text-muted-foreground">
-                        Component changelog and recent updates will appear here
-                      </p>
-                      <p className="text-xs text-muted-foreground/60">
-                        Last updated: {component._createdAt 
-                          ? new Date(component._createdAt).toLocaleDateString()
-                          : 'Unknown'
-                        }
-                      </p>
+                  {component.whatsNewContent && component.whatsNewContent.length > 0 ? (
+                    <div className="prose prose-gray dark:prose-invert max-w-none">
+                      <SimpleContentRenderer content={component.whatsNewContent} />
                     </div>
-                  </div>
+                  ) : (
+                    <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
+                      <div className="space-y-3">
+                        <p className="text-muted-foreground font-medium">No recent updates</p>
+                        <p className="text-sm text-muted-foreground">
+                          Add changelog entries in your Sanity Studio to track component updates
+                        </p>
+                        <p className="text-xs text-muted-foreground/60">
+                          Last updated: {component._createdAt 
+                            ? new Date(component._createdAt).toLocaleDateString()
+                            : 'Unknown'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>

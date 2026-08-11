@@ -254,13 +254,13 @@ export default function Home() {
                   <TabsContent value="overview" className="mt-6">
                     <div className="space-y-6">
                       <h3 className="text-lg font-semibold">Overview</h3>
-                      {selectedComponent.content && selectedComponent.content.length > 0 ? (
+                      {selectedComponent.overviewContent && selectedComponent.overviewContent.length > 0 ? (
                         <div className="prose prose-gray max-w-none">
-                          <SimpleContentRenderer content={selectedComponent.content} />
+                          <SimpleContentRenderer content={selectedComponent.overviewContent} />
                         </div>
                       ) : (
                         <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                          No overview content available. Add rich content in your Sanity Studio to get started!
+                          No overview content available. Add overview content in your Sanity Studio!
                         </div>
                       )}
                     </div>
@@ -269,22 +269,34 @@ export default function Home() {
                   <TabsContent value="code" className="mt-6">
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Code Examples</h3>
-                      <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                        Code examples will be displayed here. Add code blocks in your Sanity Studio content to show examples!
-                      </div>
+                      {selectedComponent.codeContent && selectedComponent.codeContent.length > 0 ? (
+                        <div className="prose prose-gray max-w-none">
+                          <SimpleContentRenderer content={selectedComponent.codeContent} />
+                        </div>
+                      ) : (
+                        <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                          No code examples available. Add code content in your Sanity Studio!
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
 
                   <TabsContent value="whats-new" className="mt-6">
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">What's New</h3>
-                      <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                        <div className="space-y-2">
-                          <p className="font-medium">No recent updates</p>
-                          <p className="text-sm">Component changelog and recent updates will appear here.</p>
-                          <p className="text-xs text-muted-foreground/60">Last updated: {selectedComponent._createdAt ? new Date(selectedComponent._createdAt).toLocaleDateString() : 'Unknown'}</p>
+                      {selectedComponent.whatsNewContent && selectedComponent.whatsNewContent.length > 0 ? (
+                        <div className="prose prose-gray max-w-none">
+                          <SimpleContentRenderer content={selectedComponent.whatsNewContent} />
                         </div>
-                      </div>
+                      ) : (
+                        <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                          <div className="space-y-2">
+                            <p className="font-medium">No recent updates</p>
+                            <p className="text-sm">Add changelog entries in your Sanity Studio to track component updates.</p>
+                            <p className="text-xs text-muted-foreground/60">Last updated: {selectedComponent._createdAt ? new Date(selectedComponent._createdAt).toLocaleDateString() : 'Unknown'}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
                 </Tabs>

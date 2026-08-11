@@ -133,8 +133,100 @@ const renderBlock = (block) => {
     case 'componentPreview':
       return <ComponentPreview key={block._key} node={block} />
     
-    case 'designTokens':
-      return <DesignTokens key={block._key} node={block} />
+    case 'changelogEntry':
+      return (
+        <div key={block._key} className="my-6 border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-muted border-b">
+            <div className="flex items-center justify-between">
+              <h4 className="font-semibold">{block.version || 'Version Update'}</h4>
+              {block.date && (
+                <span className="text-sm text-muted-foreground">
+                  {new Date(block.date).toLocaleDateString()}
+                </span>
+              )}
+            </div>
+            {block.type && (
+              <div className="mt-1">
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  block.type === 'breaking' ? 'bg-red-100 text-red-800' :
+                  block.type === 'feature' ? 'bg-green-100 text-green-800' :
+                  block.type === 'fix' ? 'bg-blue-100 text-blue-800' :
+                  block.type === 'improvement' ? 'bg-purple-100 text-purple-800' :
+                  block.type === 'deprecation' ? 'bg-orange-100 text-orange-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {block.type === 'feature' && '🚀 New Feature'}
+                  {block.type === 'fix' && '🐛 Bug Fix'}
+                  {block.type === 'breaking' && '💥 Breaking Change'}
+                  {block.type === 'improvement' && '✨ Improvement'}
+                  {block.type === 'deprecation' && '📦 Deprecation'}
+                  {block.type === 'maintenance' && '🔧 Maintenance'}
+                  {!['feature', 'fix', 'breaking', 'improvement', 'deprecation', 'maintenance'].includes(block.type) && block.type}
+                </span>
+              </div>
+            )}
+          </div>
+          {block.description && (
+            <div className="p-4">
+              <p className="text-sm leading-relaxed">{block.description}</p>
+            </div>
+          )}
+        </div>
+      )
+
+    case 'apiReference':
+      return (
+        <div key={block._key} className="my-6 border rounded-lg overflow-hidden">
+          {block.title && (
+            <div className="px-4 py-2 bg-muted border-b">
+              <h4 className="text-sm font-semibold">{block.title}</h4>
+            </div>
+          )}
+          {block.description && (
+            <div className="px-4 py-2 text-sm text-muted-foreground border-b bg-muted/30">
+              {block.description}
+            </div>
+          )}
+          <div className="p-4">
+            {block.props && block.props.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 font-semibold">Prop</th>
+                      <th className="text-left py-2 font-semibold">Type</th>
+                      <th className="text-left py-2 font-semibold">Required</th>
+                      <th className="text-left py-2 font-semibold">Default</th>
+                      <th className="text-left py-2 font-semibold">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {block.props.map((prop, index) => (
+                      <tr key={index} className="border-b border-border/50 last:border-0">
+                        <td className="py-2 font-mono text-sm">{prop.name}</td>
+                        <td className="py-2 font-mono text-sm text-blue-600">{prop.type}</td>
+                        <td className="py-2">
+                          {prop.required ? (
+                            <span className="text-red-600 font-semibold">Yes</span>
+                          ) : (
+                            <span className="text-muted-foreground">No</span>
+                          )}
+                        </td>
+                        <td className="py-2 font-mono text-sm">{prop.defaultValue || '-'}</td>
+                        <td className="py-2 text-muted-foreground">{prop.description || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-muted-foreground text-center py-4">
+                No props defined
+              </div>
+            )}
+          </div>
+        </div>
+      )
     
     case 'image':
       // Get the image URL using Sanity's urlFor helper
