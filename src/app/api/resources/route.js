@@ -7,6 +7,7 @@ import {
   getCacheConfig,
   getQueryParams,
   validateParams,
+  shouldBypassCache,
 } from '@/lib/api-helpers'
 
 /**
@@ -22,6 +23,7 @@ export const GET = withErrorHandling(async (request) => {
   try {
     const params = getQueryParams(request)
     const { resourceType } = params
+    const bypassCache = shouldBypassCache(request)
 
     let resources
 
@@ -46,11 +48,14 @@ export const GET = withErrorHandling(async (request) => {
       resources = await client.fetch(resourcesQuery)
     }
 
+    const cacheControl = bypassCache ? 'no-cache, no-store, must-revalidate' : getCacheConfig('resources')
+
     return successResponse(resources, {
-      cacheControl: getCacheConfig('resources'),
+      cacheControl,
       meta: {
         count: resources?.length || 0,
         contentType: 'resources',
+        cached: !bypassCache,
         ...(resourceType && { resourceType }),
       },
     })

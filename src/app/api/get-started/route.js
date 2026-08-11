@@ -6,6 +6,7 @@ import {
   withErrorHandling,
   getCacheConfig,
   getQueryParams,
+  shouldBypassCache,
 } from '@/lib/api-helpers'
 
 /**
@@ -16,13 +17,17 @@ import {
  */
 export const GET = withErrorHandling(async (request) => {
   try {
+    const bypassCache = shouldBypassCache(request)
     const getStartedPages = await client.fetch(getStartedQuery)
 
+    const cacheControl = bypassCache ? 'no-cache, no-store, must-revalidate' : getCacheConfig('get-started')
+
     return successResponse(getStartedPages, {
-      cacheControl: getCacheConfig('get-started'),
+      cacheControl,
       meta: {
         count: getStartedPages?.length || 0,
         contentType: 'get-started',
+        cached: !bypassCache,
       },
     })
   } catch (error) {
