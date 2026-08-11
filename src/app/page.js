@@ -21,17 +21,21 @@ export default function Home() {
   const [expandedGetStarted, setExpandedGetStarted] = useState(false)
   const [expandedResources, setExpandedResources] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [lastRefresh, setLastRefresh] = useState(Date.now())
 
   // Fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Add cache-busting parameter to ensure fresh data
+        const timestamp = lastRefresh
+        
         // Use API endpoints instead of direct Sanity calls
         const [componentsResponse, foundationsResponse, getStartedResponse, resourcesResponse] = await Promise.all([
-          fetch('/api/components'),
-          fetch('/api/foundations'),
-          fetch('/api/get-started'),
-          fetch('/api/resources')
+          fetch(`/api/components?t=${timestamp}`),
+          fetch(`/api/foundations?t=${timestamp}`),
+          fetch(`/api/get-started?t=${timestamp}`),
+          fetch(`/api/resources?refresh=true&t=${timestamp}`)
         ])
         
         const componentsData = await componentsResponse.json()
@@ -70,7 +74,13 @@ export default function Home() {
     }
 
     fetchData()
-  }, [])
+  }, [lastRefresh])
+
+  // Function to refresh data
+  const refreshData = () => {
+    setLastRefresh(Date.now())
+    setLoading(true)
+  }
 
   const FOUNDATIONS_ITEMS = [
     { label: 'Principles', slug: 'principles' },
@@ -120,6 +130,13 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-4">
               <Badge variant="secondary">v1.0</Badge>
+              <button 
+                onClick={refreshData}
+                className="px-2 py-1 text-xs border rounded bg-muted hover:bg-accent"
+                title="Refresh data"
+              >
+                🔄
+              </button>
               <a href="https://github.com/khoatran-git/design-system-nextjs" target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="sm">GitHub</Button>
               </a>
