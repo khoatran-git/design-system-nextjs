@@ -1,6 +1,8 @@
 // Simple content renderer without @portabletext/react dependency
 // This avoids React version conflicts during build
 
+import { urlFor } from '@/lib/sanity.client'
+
 // Component for rendering code blocks
 const CodeBlock = ({ node }) => {
   const { title, language, code, description } = node
@@ -135,17 +137,29 @@ const renderBlock = (block) => {
       return <DesignTokens key={block._key} node={block} />
     
     case 'image':
+      // Get the image URL using Sanity's urlFor helper
+      const imageUrl = urlFor(block)?.url()
+      
       return (
         <div key={block._key} className="my-6">
-          <img
-            src={block.asset?.url}
-            alt={block.alt || ''}
-            className="max-w-full h-auto rounded-lg border"
-          />
-          {block.caption && (
-            <p className="text-sm text-muted-foreground text-center mt-2">
-              {block.caption}
-            </p>
+          {imageUrl ? (
+            <>
+              <img
+                src={imageUrl}
+                alt={block.alt || 'Image'}
+                className="max-w-full h-auto rounded-lg border shadow-sm"
+              />
+              {block.caption && (
+                <p className="text-sm text-muted-foreground text-center mt-2 italic">
+                  {block.caption}
+                </p>
+              )}
+            </>
+          ) : (
+            <div className="p-4 border border-dashed border-muted-foreground/25 rounded-lg text-center text-muted-foreground">
+              <p>Image could not be loaded</p>
+              {block.alt && <p className="text-xs mt-1">{block.alt}</p>}
+            </div>
           )}
         </div>
       )
