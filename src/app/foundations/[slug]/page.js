@@ -1,19 +1,25 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Badge } from '../../../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
+import { ChevronDown } from 'lucide-react'
 import SimpleContentRenderer from '../../../components/PortableTextComponents'
 
 export default function FoundationPage() {
   const params = useParams()
+  const router = useRouter()
   const [foundation, setFoundation] = useState(null)
+  const [foundations, setFoundations] = useState([])
+  const [components, setComponents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [expandedMenu, setExpandedMenu] = useState('components')
+  const [expandedFoundations, setExpandedFoundations] = useState(true) // Start expanded
 
   useEffect(() => {
-    const fetchFoundation = async () => {
+    const fetchData = async () => {
       if (!params?.slug) {
         setError('Foundation not found')
         setLoading(false)
@@ -21,14 +27,24 @@ export default function FoundationPage() {
       }
 
       try {
-        const response = await fetch(`/api/foundations/${params.slug}`)
-        const data = await response.json()
+        // Fetch foundation data and sidebar data in parallel
+        const [foundationResponse, foundationsResponse, componentsResponse] = await Promise.all([
+          fetch(`/api/foundations/${params.slug}`),
+          fetch('/api/foundations'),
+          fetch('/api/components')
+        ])
+        
+        const foundationData = await foundationResponse.json()
+        const foundationsData = await foundationsResponse.json()
+        const componentsData = await componentsResponse.json()
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch foundation')
+        if (!foundationResponse.ok) {
+          throw new Error(foundationData.error || 'Failed to fetch foundation')
         }
 
-        setFoundation(data.data)
+        setFoundation(foundationData.data)
+        setFoundations(foundationsData.data || [])
+        setComponents(componentsData.data || [])
       } catch (error) {
         console.error('Error fetching foundation:', error)
         setError(error.message)
@@ -37,8 +53,16 @@ export default function FoundationPage() {
       }
     }
 
-    fetchFoundation()
+    fetchData()
   }, [params.slug])
+
+  // Group components by category
+  const componentsByCategory = components.reduce((acc, component) => {
+    const category = component.category || 'Uncategorized'
+    if (!acc[category]) acc[category] = []
+    acc[category].push(component)
+    return acc
+  }, {})
 
   if (loading) {
     return (
@@ -59,11 +83,12 @@ export default function FoundationPage() {
           <p className="text-muted-foreground mb-6">
             {error || 'The foundation you are looking for does not exist.'}
           </p>
-          <a href="/">
-            <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md">
-              Back to Home
-            </button>
-          </a>
+          <button 
+            onClick={() => router.push('/')}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
+          >
+            Back to Home
+          </button>
         </div>
       </div>
     )
@@ -89,8 +114,187 @@ export default function FoundationPage() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1">
+      {/* Main Layout */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar - Independently Scrollable */}
+        <aside className="w-64 border-r bg-muted/30 flex flex-col overflow-hidden">
+          <div className="p-4 border-b bg-background flex-shrink-0">
+            <h2 className="text-sm font-semibold">Menu</h2>
+          </div>
+          
+          {/* Scrollable Navigation */}
+          <nav className="p-4 space-y-2 overflow-y-auto flex-1">
+            {/* Get Started */}
+            <button
+              onClick={() => router.push('/')}
+              className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground active:bg-primary active:text-primary-foreground"
+            >
+              Get Started
+            </button>
+
+            {/* Foundations (Collapsible) */}
+            <div>
+              <button
+                onClick={() => setExpandedFoundations(!expandedFoundations)}
+                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+              >
+                <span>Foundations</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedFoundations ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Foundations List (Nested) */}
+              {expandedFoundations && (
+                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                  {foundations.map((foundationItem) => (
+                    <button
+                      key={foundationItem.slug.current}
+                      onClick={() => router.push(`/foundations/${foundationItem.slug.current}`)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                        params.slug === foundationItem.slug.current
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                      }`}
+                    >
+                      {foundationItem.title}
+                    </button>
+                  ))}
+                  
+                  {foundations.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No foundations found. Add some in your Sanity Studio!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Components (Collapsible) */}
+            <div>
+              <button
+                onClick={() => setExpandedMenu(expandedMenu === 'components' ? null : 'components')}
+                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+              >
+                <span>Components ({components.length})</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Components List (Nested) */}
+              {expandedMenu === 'components' && (
+                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                  {Object.entries(componentsByCategory).map(([category, categoryComponents]) => (
+                    <div key={category}>
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1">
+                        {category}
+                      </div>
+                      {categoryComponents.map((comp) => (
+                        <button
+                          key={comp._id}
+                          onClick={() => router.push('/')}
+                          className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
+                        >
+                          {comp.title}
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                  
+                  {components.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No components found. Add some in your Sanity Studio!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Resources */}
+            <button
+              className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground active:bg-primary active:text-primary-foreground"
+            >
+              Resources
+            </button>
+          </nav>
+        </aside>
+
+        {/* Main Content Area - Independently Scrollable */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="min-h-full">
+            {/* Banner Section */}
+            <div className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
+              <div className="px-8 py-12">
+                <div className="max-w-4xl">
+                  <div className="flex items-center gap-3 mb-4">
+                    <h1 className="text-4xl font-bold tracking-tight">{foundation.title}</h1>
+                    <Badge>{foundation.category || 'Foundation'}</Badge>
+                    <Badge variant="outline">{foundation.status}</Badge>
+                  </div>
+                  <p className="text-lg text-muted-foreground max-w-2xl">
+                    {foundation.description || 'No description provided'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabs Section */}
+            <div className="px-8 py-8 max-w-4xl">
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 max-w-md">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="code">Code</TabsTrigger>
+                  <TabsTrigger value="whats-new">What's new</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="mt-6">
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-semibold">Overview</h3>
+                    {foundation.content && foundation.content.length > 0 ? (
+                      <div className="prose prose-gray max-w-none">
+                        <SimpleContentRenderer content={foundation.content} />
+                      </div>
+                    ) : (
+                      <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                        <div className="space-y-2">
+                          <p className="font-medium">No overview content available</p>
+                          <p className="text-sm">Add rich content in your Sanity Studio to get started!</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="code" className="mt-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Code Examples</h3>
+                    <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                      <div className="space-y-2">
+                        <p className="font-medium">No code examples available</p>
+                        <p className="text-sm">Code examples coming soon for foundation guidelines.</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="whats-new" className="mt-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">What's New</h3>
+                    <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+                      <div className="space-y-2">
+                        <p className="font-medium">No recent updates</p>
+                        <p className="text-sm">Check back later for foundation updates and improvements.</p>
+                        <p className="text-xs text-muted-foreground/60">
+                          Last updated: {foundation._updatedAt ? new Date(foundation._updatedAt).toLocaleDateString() : 'Unknown'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
         {/* Banner Section */}
         <div className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
           <div className="px-8 py-12">
@@ -162,14 +366,16 @@ export default function FoundationPage() {
             </TabsContent>
           </Tabs>
 
-          {/* Footer Info */}
-          <div className="mt-12 pt-8 border-t">
-            <div className="text-center text-sm text-muted-foreground">
-              <p>Last updated: {foundation._updatedAt ? new Date(foundation._updatedAt).toLocaleDateString() : 'Unknown'}</p>
+              {/* Footer Info */}
+              <div className="mt-12 pt-8 border-t">
+                <div className="text-center text-sm text-muted-foreground">
+                  <p>Last updated: {foundation._updatedAt ? new Date(foundation._updatedAt).toLocaleDateString() : 'Unknown'}</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   )
 }
