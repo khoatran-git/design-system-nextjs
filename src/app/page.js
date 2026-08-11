@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { sanityFetch } from '../../lib/sanity.client'
-import { componentsQuery, componentsMinimalQuery, categoriesQuery } from '../../lib/sanity.queries'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
@@ -21,17 +19,30 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [componentsData, categoriesData] = await Promise.all([
-          sanityFetch(componentsQuery),
-          sanityFetch(categoriesQuery)
+        // Use API endpoints instead of direct Sanity calls
+        const [componentsResponse, categoriesResponse] = await Promise.all([
+          fetch('/api/components'),
+          fetch('/api/components') // We'll get categories from components data
         ])
         
-        setComponents(componentsData || [])
-        setCategories(categoriesData || [])
+        const componentsData = await componentsResponse.json()
+        
+        // Extract components from API response
+        const components = componentsData.data || []
+        
+        // Extract unique categories from components
+        const uniqueCategories = [...new Set(
+          components
+            .map(comp => comp.category)
+            .filter(Boolean)
+        )]
+        
+        setComponents(components)
+        setCategories(uniqueCategories.map(cat => ({ category: cat })))
         
         // Set first component as selected by default
-        if (componentsData && componentsData.length > 0) {
-          setSelectedComponent(componentsData[0])
+        if (components && components.length > 0) {
+          setSelectedComponent(components[0])
         }
       } catch (error) {
         console.error('Error fetching data:', error)
