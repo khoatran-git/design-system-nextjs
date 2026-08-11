@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import SimpleContentRenderer from '@/components/PortableTextComponents'
+import { Badge } from '../../../components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
+import SimpleContentRenderer from '../../../components/PortableTextComponents'
 
 export default function FoundationPage() {
   const params = useParams()
