@@ -16,6 +16,10 @@ export async function GET() {
       query: componentsQuery,
       componentCount: components?.length || 0,
       components: components || [],
+      hasContent: components?.map(c => ({ 
+        title: c.title, 
+        hasContent: !!(c.content && c.content.length > 0) 
+      })) || [],
       timestamp: new Date().toISOString()
     })
   } catch (error) {
