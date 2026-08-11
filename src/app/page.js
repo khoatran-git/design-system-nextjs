@@ -254,9 +254,10 @@ export default function Home() {
                   <TabsContent value="overview" className="mt-6">
                     <div className="space-y-6">
                       <h3 className="text-lg font-semibold">Overview</h3>
-                      {selectedComponent.overviewContent && selectedComponent.overviewContent.length > 0 ? (
+                      {(selectedComponent.overviewContent && selectedComponent.overviewContent.length > 0) || 
+                       (selectedComponent.content && selectedComponent.content.length > 0) ? (
                         <div className="prose prose-gray max-w-none">
-                          <SimpleContentRenderer content={selectedComponent.overviewContent} />
+                          <SimpleContentRenderer content={selectedComponent.overviewContent || selectedComponent.content || []} />
                         </div>
                       ) : (
                         <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">

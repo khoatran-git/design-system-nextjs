@@ -122,9 +122,10 @@ export default function ComponentPage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">Overview</h2>
-                  {component.overviewContent && component.overviewContent.length > 0 ? (
+                  {(component.overviewContent && component.overviewContent.length > 0) ||
+                   (component.content && component.content.length > 0) ? (
                     <div className="prose prose-gray dark:prose-invert max-w-none">
-                      <SimpleContentRenderer content={component.overviewContent} />
+                      <SimpleContentRenderer content={component.overviewContent || component.content || []} />
                     </div>
                   ) : (
                     <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center">
