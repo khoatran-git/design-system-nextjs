@@ -12,10 +12,14 @@ export default function Home() {
   const router = useRouter()
   const [components, setComponents] = useState([])
   const [foundations, setFoundations] = useState([])
+  const [getStartedPages, setGetStartedPages] = useState([])
+  const [resources, setResources] = useState([])
   const [categories, setCategories] = useState([])
   const [selectedComponent, setSelectedComponent] = useState(null)
   const [expandedMenu, setExpandedMenu] = useState('components')
   const [expandedFoundations, setExpandedFoundations] = useState(false)
+  const [expandedGetStarted, setExpandedGetStarted] = useState(false)
+  const [expandedResources, setExpandedResources] = useState(false)
   const [loading, setLoading] = useState(true)
 
   // Fetch data on component mount
@@ -23,17 +27,23 @@ export default function Home() {
     const fetchData = async () => {
       try {
         // Use API endpoints instead of direct Sanity calls
-        const [componentsResponse, foundationsResponse] = await Promise.all([
+        const [componentsResponse, foundationsResponse, getStartedResponse, resourcesResponse] = await Promise.all([
           fetch('/api/components'),
-          fetch('/api/foundations')
+          fetch('/api/foundations'),
+          fetch('/api/get-started'),
+          fetch('/api/resources')
         ])
         
         const componentsData = await componentsResponse.json()
         const foundationsData = await foundationsResponse.json()
+        const getStartedData = await getStartedResponse.json()
+        const resourcesData = await resourcesResponse.json()
         
         // Extract components from API response
         const components = componentsData.data || []
         const foundations = foundationsData.data || []
+        const getStartedPages = getStartedData.data || []
+        const resources = resourcesData.data || []
         
         // Extract unique categories from components
         const uniqueCategories = [...new Set(
@@ -44,6 +54,8 @@ export default function Home() {
         
         setComponents(components)
         setFoundations(foundations)
+        setGetStartedPages(getStartedPages)
+        setResources(resources)
         setCategories(uniqueCategories.map(cat => ({ category: cat })))
         
         // Set first component as selected by default
@@ -127,11 +139,39 @@ export default function Home() {
           {/* Scrollable Navigation */}
           <nav className="p-4 space-y-2 overflow-y-auto flex-1">
             {/* Get Started */}
-            <button
-              className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground active:bg-primary active:text-primary-foreground"
-            >
-              Get Started
-            </button>
+            <div>
+              <button
+                onClick={() => setExpandedGetStarted(!expandedGetStarted)}
+                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+              >
+                <span>Get Started</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedGetStarted ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Get Started List (Nested) */}
+              {expandedGetStarted && (
+                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                  {getStartedPages.map((page) => (
+                    <button
+                      key={page.slug.current}
+                      onClick={() => router.push(`/get-started/${page.slug.current}`)}
+                      className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
+                    >
+                      {page.title}
+                    </button>
+                  ))}
+                  
+                  {getStartedPages.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No get started pages found. Add some in your Sanity Studio!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Foundations (Collapsible) */}
             <div>
@@ -215,11 +255,39 @@ export default function Home() {
             </div>
 
             {/* Resources */}
-            <button
-              className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground active:bg-primary active:text-primary-foreground"
-            >
-              Resources
-            </button>
+            <div>
+              <button
+                onClick={() => setExpandedResources(!expandedResources)}
+                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+              >
+                <span>Resources</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedResources ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Resources List (Nested) */}
+              {expandedResources && (
+                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                  {resources.map((resource) => (
+                    <button
+                      key={resource.slug.current}
+                      onClick={() => router.push(`/resources/${resource.slug.current}`)}
+                      className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
+                    >
+                      {resource.title}
+                    </button>
+                  ))}
+                  
+                  {resources.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No resources found. Add some in your Sanity Studio!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </nav>
         </aside>
 
