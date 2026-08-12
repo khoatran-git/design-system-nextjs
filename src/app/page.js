@@ -140,11 +140,13 @@ export default function Home() {
     { label: 'UX Writing', slug: 'ux-writing' },
   ]
 
-  // Group components by category
+  // Group components by category, skip uncategorized
   const componentsByCategory = components.reduce((acc, component) => {
-    const category = component.category || 'Uncategorized'
-    if (!acc[category]) acc[category] = []
-    acc[category].push(component)
+    const category = component.category
+    if (category) { // Only include components with categories
+      if (!acc[category]) acc[category] = []
+      acc[category].push(component)
+    }
     return acc
   }, {})
 
@@ -281,7 +283,7 @@ export default function Home() {
                 onClick={() => setExpandedMenu(expandedMenu === 'components' ? null : 'components')}
                 className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
               >
-                <span>Components ({components.length})</span>
+                <span>Components</span>
                 <ChevronDown 
                   size={16} 
                   className={`transition-transform duration-200 ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
@@ -291,6 +293,7 @@ export default function Home() {
               {/* Components List (Nested) */}
               {expandedMenu === 'components' && (
                 <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                  {/* Components with categories */}
                   {Object.entries(componentsByCategory).map(([category, categoryComponents]) => (
                     <div key={category}>
                       <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1">
@@ -310,6 +313,21 @@ export default function Home() {
                         </button>
                       ))}
                     </div>
+                  ))}
+                  
+                  {/* Components without categories */}
+                  {components.filter(comp => !comp.category).map((comp) => (
+                    <button
+                      key={comp._id}
+                      onClick={() => selectComponent(comp)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                        selectedContent?._id === comp._id
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                      }`}
+                    >
+                      {comp.title}
+                    </button>
                   ))}
                   
                   {components.length === 0 && (
