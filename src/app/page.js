@@ -472,7 +472,141 @@ const ComponentContent = ({ content }) => (
       <TabsContent value="code" className="mt-6">
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Code Examples</h3>
-          {content.codeContent && content.codeContent.length > 0 ? (
+          {content.title === 'Buttons' ? (
+            <div className="prose prose-gray max-w-none">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Installation</h4>
+                  <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                    <code>npx shadcn@latest add button</code>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Usage</h4>
+                  <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                    <pre>{`import { Button } from "@/components/ui/button"
+
+<Button variant="outline">Button</Button>`}</pre>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Variants</h4>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <p className="mb-2 font-medium">Default</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <code>{`<Button>Button</Button>`}</code>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 font-medium">Outline</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <code>{`<Button variant="outline">Button</Button>`}</code>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 font-medium">Secondary</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <code>{`<Button variant="secondary">Button</Button>`}</code>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 font-medium">Ghost</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <code>{`<Button variant="ghost">Button</Button>`}</code>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 font-medium">Destructive</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <code>{`<Button variant="destructive">Button</Button>`}</code>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 font-medium">Link</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <code>{`<Button variant="link">Button</Button>`}</code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Sizes</h4>
+                  <p className="mb-3">Use the size prop to change the size of the button.</p>
+                  <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                    <pre>{`<Button size="default">Default</Button>
+<Button size="sm">Small</Button>
+<Button size="lg">Large</Button>
+<Button size="icon">Icon</Button>`}</pre>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">With Icon</h4>
+                  <p className="mb-3">Remember to add the data-icon="inline-start" or data-icon="inline-end" attribute to the icon for the correct spacing.</p>
+                  <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                    <pre>{`import { Mail } from "lucide-react"
+
+<Button>
+  <Mail className="mr-2 h-4 w-4" />
+  Login with Email
+</Button>`}</pre>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">As Child</h4>
+                  <p className="mb-3">You can use the asChild prop on Button to make another component look like a button.</p>
+                  <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                    <pre>{`<Button asChild>
+  <Link href="/login">Login</Link>
+</Button>`}</pre>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">API Reference</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border border-gray-300 px-4 py-2 text-left">Prop</th>
+                          <th className="border border-gray-300 px-4 py-2 text-left">Type</th>
+                          <th className="border border-gray-300 px-4 py-2 text-left">Default</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-gray-300 px-4 py-2">variant</td>
+                          <td className="border border-gray-300 px-4 py-2">"default" | "outline" | "ghost" | "destructive" | "secondary" | "link"</td>
+                          <td className="border border-gray-300 px-4 py-2">"default"</td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 px-4 py-2">size</td>
+                          <td className="border border-gray-300 px-4 py-2">"default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"</td>
+                          <td className="border border-gray-300 px-4 py-2">"default"</td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 px-4 py-2">asChild</td>
+                          <td className="border border-gray-300 px-4 py-2">boolean</td>
+                          <td className="border border-gray-300 px-4 py-2">false</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : content.codeContent && content.codeContent.length > 0 ? (
             <div className="prose prose-gray max-w-none">
               <SimpleContentRenderer content={content.codeContent} />
             </div>
