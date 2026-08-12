@@ -1,5 +1,5 @@
-import { client } from '../../../lib/sanity.client'
-import { successResponse, errorResponse } from '../../../lib/api-helpers'
+import { client } from '@/lib/sanity.client'
+import { successResponse, errorResponse } from '@/lib/api-helpers'
 
 export async function GET(request) {
   try {
