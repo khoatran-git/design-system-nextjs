@@ -456,6 +456,109 @@ const ComponentContent = ({ content }) => (
       <TabsContent value="overview" className="mt-6">
         <div className="space-y-6">
           <h3 className="text-lg font-semibold">Overview</h3>
+          
+          {/* Interactive Demo Section for Buttons */}
+          {content.title === 'Buttons' && (
+            <div className="space-y-4">
+              <h4 className="text-md font-semibold">Interactive Demo</h4>
+              <div className="p-6 border rounded-lg bg-background">
+                <div className="space-y-6">
+                  <div>
+                    <h5 className="text-sm font-medium mb-3">Button Variants</h5>
+                    <div className="flex flex-wrap gap-3">
+                      <Button>Default</Button>
+                      <Button variant="secondary">Secondary</Button>
+                      <Button variant="outline">Outline</Button>
+                      <Button variant="ghost">Ghost</Button>
+                      <Button variant="destructive">Destructive</Button>
+                      <Button variant="link">Link</Button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h5 className="text-sm font-medium mb-3">Button Sizes</h5>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button size="sm">Small</Button>
+                      <Button size="default">Default</Button>
+                      <Button size="lg">Large</Button>
+                      <Button size="icon">🚀</Button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h5 className="text-sm font-medium mb-3">Loading & Disabled States</h5>
+                    <div className="flex flex-wrap gap-3">
+                      <Button disabled>Disabled</Button>
+                      <Button>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Loading...
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Interactive Demo Section for Checkboxes */}
+          {content.title === 'Checkboxes' && (
+            <div className="space-y-4">
+              <h4 className="text-md font-semibold">Interactive Demo</h4>
+              <div className="p-6 border rounded-lg bg-background">
+                <div className="space-y-6">
+                  <div>
+                    <h5 className="text-sm font-medium mb-3">Basic Checkboxes</h5>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="checkbox1" className="rounded border-gray-300" />
+                        <label htmlFor="checkbox1" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          Accept terms and conditions
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="checkbox2" className="rounded border-gray-300" defaultChecked />
+                        <label htmlFor="checkbox2" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          Subscribe to newsletter
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="checkbox3" className="rounded border-gray-300" disabled />
+                        <label htmlFor="checkbox3" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          Disabled checkbox
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h5 className="text-sm font-medium mb-3">Checkbox Group</h5>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Select your interests:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="design" className="rounded border-gray-300" />
+                          <label htmlFor="design" className="text-sm">Design</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="development" className="rounded border-gray-300" />
+                          <label htmlFor="development" className="text-sm">Development</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="marketing" className="rounded border-gray-300" />
+                          <label htmlFor="marketing" className="text-sm">Marketing</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="research" className="rounded border-gray-300" />
+                          <label htmlFor="research" className="text-sm">Research</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {(content.overviewContent && content.overviewContent.length > 0) || 
            (content.content && content.content.length > 0) ? (
             <div className="prose prose-gray max-w-none">
