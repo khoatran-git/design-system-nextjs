@@ -15,12 +15,14 @@ export default function Home() {
   const [getStartedPages, setGetStartedPages] = useState([])
   const [resources, setResources] = useState([])
   const [categories, setCategories] = useState([])
-  const [selectedComponent, setSelectedComponent] = useState(null)
+  const [selectedContent, setSelectedContent] = useState(null)
+  const [selectedContentType, setSelectedContentType] = useState('component') // 'component', 'foundation', 'resource', 'getStarted'
   const [expandedMenu, setExpandedMenu] = useState('components')
   const [expandedFoundations, setExpandedFoundations] = useState(false)
   const [expandedGetStarted, setExpandedGetStarted] = useState(false)
   const [expandedResources, setExpandedResources] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [contentLoading, setContentLoading] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(Date.now())
 
   // Fetch data on component mount
@@ -64,7 +66,8 @@ export default function Home() {
         
         // Set first component as selected by default
         if (components && components.length > 0) {
-          setSelectedComponent(components[0])
+          setSelectedContent(components[0])
+          setSelectedContentType('component')
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -80,6 +83,45 @@ export default function Home() {
   const refreshData = () => {
     setLastRefresh(Date.now())
     setLoading(true)
+  }
+
+  // Function to load individual content by type and slug
+  const loadContent = async (type, slug) => {
+    if (!slug) return
+    
+    setContentLoading(true)
+    try {
+      const timestamp = Date.now()
+      const response = await fetch(`/api/${type}/${slug}?refresh=true&t=${timestamp}`)
+      const data = await response.json()
+      
+      if (response.ok) {
+        setSelectedContent(data.data)
+        setSelectedContentType(type.replace('-', ''))
+      }
+    } catch (error) {
+      console.error(`Error loading ${type} content:`, error)
+    } finally {
+      setContentLoading(false)
+    }
+  }
+
+  // Content selection handlers
+  const selectComponent = (component) => {
+    setSelectedContent(component)
+    setSelectedContentType('component')
+  }
+
+  const selectFoundation = (foundation) => {
+    loadContent('foundations', foundation.slug.current)
+  }
+
+  const selectGetStarted = (page) => {
+    loadContent('get-started', page.slug.current)
+  }
+
+  const selectResource = (resource) => {
+    loadContent('resources', resource.slug.current)
   }
 
   const FOUNDATIONS_ITEMS = [
@@ -174,8 +216,12 @@ export default function Home() {
                   {getStartedPages.map((page) => (
                     <button
                       key={page.slug.current}
-                      onClick={() => router.push(`/get-started/${page.slug.current}`)}
-                      className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
+                      onClick={() => selectGetStarted(page)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                        selectedContent?._id === page._id
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                      }`}
                     >
                       {page.title}
                     </button>
@@ -209,8 +255,12 @@ export default function Home() {
                   {foundations.map((foundation) => (
                     <button
                       key={foundation.slug.current}
-                      onClick={() => router.push(`/foundations/${foundation.slug.current}`)}
-                      className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
+                      onClick={() => selectFoundation(foundation)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                        selectedContent?._id === foundation._id
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                      }`}
                     >
                       {foundation.title}
                     </button>
@@ -249,9 +299,9 @@ export default function Home() {
                       {categoryComponents.map((comp) => (
                         <button
                           key={comp._id}
-                          onClick={() => setSelectedComponent(comp)}
+                          onClick={() => selectComponent(comp)}
                           className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
-                            selectedComponent?._id === comp._id
+                            selectedContent?._id === comp._id
                               ? 'bg-primary text-primary-foreground font-medium'
                               : 'text-foreground hover:bg-accent hover:text-accent-foreground'
                           }`}
@@ -290,8 +340,12 @@ export default function Home() {
                   {resources.map((resource) => (
                     <button
                       key={resource.slug.current}
-                      onClick={() => router.push(`/resources/${resource.slug.current}`)}
-                      className="w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground"
+                      onClick={() => selectResource(resource)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                        selectedContent?._id === resource._id
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                      }`}
                     >
                       {resource.title}
                     </button>
@@ -310,91 +364,46 @@ export default function Home() {
 
         {/* Main Content Area - Independently Scrollable */}
         <main className="flex-1 overflow-y-auto">
-          {selectedComponent ? (
+          {selectedContent ? (
             <div className="min-h-full">
+              {contentLoading && (
+                <div className="absolute top-4 right-4 z-50">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                </div>
+              )}
+              
               {/* Banner Section */}
               <div className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
                 <div className="px-8 py-12">
                   <div className="max-w-4xl">
                     <div className="flex items-center gap-3 mb-4">
-                      <h1 className="text-4xl font-bold tracking-tight">{selectedComponent.title}</h1>
-                      <Badge>{selectedComponent.category || 'Component'}</Badge>
-                      <Badge variant="outline">{selectedComponent.status}</Badge>
+                      <h1 className="text-4xl font-bold tracking-tight">{selectedContent.title}</h1>
+                      <Badge>
+                        {selectedContentType === 'component' ? selectedContent.category || 'Component' :
+                         selectedContentType === 'foundation' ? selectedContent.category || 'Foundation' :
+                         selectedContentType === 'getstarted' ? 'Get Started' :
+                         selectedContentType === 'resource' ? selectedContent.resourceType || 'Resource' : 
+                         'Content'}
+                      </Badge>
+                      <Badge variant="outline">{selectedContent.status}</Badge>
                     </div>
                     <p className="text-lg text-muted-foreground max-w-2xl">
-                      {selectedComponent.description || 'No description provided'}
+                      {selectedContent.description || 'No description provided'}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Tabs Section */}
-              <div className="px-8 py-8 max-w-4xl">
-                <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 max-w-md">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="code">Code</TabsTrigger>
-                    <TabsTrigger value="whats-new">What's new</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="overview" className="mt-6">
-                    <div className="space-y-6">
-                      <h3 className="text-lg font-semibold">Overview</h3>
-                      {(selectedComponent.overviewContent && selectedComponent.overviewContent.length > 0) || 
-                       (selectedComponent.content && selectedComponent.content.length > 0) ? (
-                        <div className="prose prose-gray max-w-none">
-                          <SimpleContentRenderer content={selectedComponent.overviewContent || selectedComponent.content || []} />
-                        </div>
-                      ) : (
-                        <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                          No overview content available. Add overview content in your Sanity Studio!
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="code" className="mt-6">
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Code Examples</h3>
-                      {selectedComponent.codeContent && selectedComponent.codeContent.length > 0 ? (
-                        <div className="prose prose-gray max-w-none">
-                          <SimpleContentRenderer content={selectedComponent.codeContent} />
-                        </div>
-                      ) : (
-                        <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                          No code examples available. Add code content in your Sanity Studio!
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="whats-new" className="mt-6">
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">What's New</h3>
-                      {selectedComponent.whatsNewContent && selectedComponent.whatsNewContent.length > 0 ? (
-                        <div className="prose prose-gray max-w-none">
-                          <SimpleContentRenderer content={selectedComponent.whatsNewContent} />
-                        </div>
-                      ) : (
-                        <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
-                          <div className="space-y-2">
-                            <p className="font-medium">No recent updates</p>
-                            <p className="text-sm">Add changelog entries in your Sanity Studio to track component updates.</p>
-                            <p className="text-xs text-muted-foreground/60">Last updated: {selectedComponent._createdAt ? new Date(selectedComponent._createdAt).toLocaleDateString() : 'Unknown'}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-                </Tabs>
-
-                {/* Footer Info */}
-                <div className="mt-12 pt-8 border-t">
-                  <div className="text-center text-sm text-muted-foreground">
-                    <p>Last updated: {selectedComponent._createdAt ? new Date(selectedComponent._createdAt).toLocaleDateString() : 'Unknown'}</p>
-                  </div>
-                </div>
-              </div>
+              {/* Dynamic Content based on type */}
+              {selectedContentType === 'component' ? (
+                <ComponentContent content={selectedContent} />
+              ) : selectedContentType === 'foundation' ? (
+                <FoundationContent content={selectedContent} />
+              ) : selectedContentType === 'getstarted' ? (
+                <GetStartedContent content={selectedContent} />
+              ) : selectedContentType === 'resource' ? (
+                <ResourceContent content={selectedContent} />
+              ) : null}
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center">
@@ -402,8 +411,8 @@ export default function Home() {
                 <h2 className="text-2xl font-bold mb-4">Welcome to Group Design System</h2>
                 <p className="text-muted-foreground mb-6 max-w-md">
                   {components.length > 0 
-                    ? 'Select a component from the sidebar to get started.' 
-                    : 'No components found. Add some components in your Sanity Studio to get started!'
+                    ? 'Select an item from the sidebar to get started.' 
+                    : 'No content found. Add some content in your Sanity Studio!'
                   }
                 </p>
                 {components.length === 0 && (
@@ -423,3 +432,261 @@ export default function Home() {
     </div>
   )
 }
+
+// Content Components for different types  
+const ComponentContent = ({ content }) => (
+  <div className="px-8 py-8 max-w-4xl">
+    <Tabs defaultValue="overview" className="w-full">
+      <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="code">Code</TabsTrigger>
+        <TabsTrigger value="whats-new">What's new</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="mt-6">
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold">Overview</h3>
+          {(content.overviewContent && content.overviewContent.length > 0) || 
+           (content.content && content.content.length > 0) ? (
+            <div className="prose prose-gray max-w-none">
+              <SimpleContentRenderer content={content.overviewContent || content.content || []} />
+            </div>
+          ) : (
+            <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+              No overview content available. Add overview content in your Sanity Studio!
+            </div>
+          )}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="code" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Code Examples</h3>
+          {content.codeContent && content.codeContent.length > 0 ? (
+            <div className="prose prose-gray max-w-none">
+              <SimpleContentRenderer content={content.codeContent} />
+            </div>
+          ) : (
+            <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+              No code examples available. Add code content in your Sanity Studio!
+            </div>
+          )}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="whats-new" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">What's New</h3>
+          {content.whatsNewContent && content.whatsNewContent.length > 0 ? (
+            <div className="prose prose-gray max-w-none">
+              <SimpleContentRenderer content={content.whatsNewContent} />
+            </div>
+          ) : (
+            <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+              <div className="space-y-2">
+                <p className="font-medium">No recent updates</p>
+                <p className="text-sm">Add changelog entries in your Sanity Studio to track component updates.</p>
+                <p className="text-xs text-muted-foreground/60">Last updated: {content._createdAt ? new Date(content._createdAt).toLocaleDateString() : 'Unknown'}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </TabsContent>
+    </Tabs>
+
+    <div className="mt-12 pt-8 border-t">
+      <div className="text-center text-sm text-muted-foreground">
+        <p>Last updated: {content._createdAt ? new Date(content._createdAt).toLocaleDateString() : 'Unknown'}</p>
+      </div>
+    </div>
+  </div>
+)
+
+const FoundationContent = ({ content }) => (
+  <div className="px-8 py-8 max-w-4xl">
+    <Tabs defaultValue="overview" className="w-full">
+      <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="code">Code</TabsTrigger>
+        <TabsTrigger value="whats-new">What's new</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="mt-6">
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold">Overview</h3>
+          {content.content && content.content.length > 0 ? (
+            <div className="prose prose-gray max-w-none">
+              <SimpleContentRenderer content={content.content} />
+            </div>
+          ) : (
+            <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+              <div className="space-y-2">
+                <p className="font-medium">No overview content available</p>
+                <p className="text-sm">Add rich content in your Sanity Studio to get started!</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="code" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Code Examples</h3>
+          <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+            <div className="space-y-2">
+              <p className="font-medium">No code examples available</p>
+              <p className="text-sm">Code examples coming soon for foundation guidelines.</p>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="whats-new" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">What's New</h3>
+          <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+            <div className="space-y-2">
+              <p className="font-medium">No recent updates</p>
+              <p className="text-sm">Check back later for foundation updates and improvements.</p>
+              <p className="text-xs text-muted-foreground/60">
+                Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+
+    <div className="mt-12 pt-8 border-t">
+      <div className="text-center text-sm text-muted-foreground">
+        <p>Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}</p>
+      </div>
+    </div>
+  </div>
+)
+
+const GetStartedContent = ({ content }) => (
+  <div className="px-8 py-8 max-w-4xl">
+    <Tabs defaultValue="overview" className="w-full">
+      <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="code">Code</TabsTrigger>
+        <TabsTrigger value="whats-new">What's new</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="mt-6">
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold">Overview</h3>
+          {content.content && content.content.length > 0 ? (
+            <div className="prose prose-gray max-w-none">
+              <SimpleContentRenderer content={content.content} />
+            </div>
+          ) : (
+            <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+              <div className="space-y-2">
+                <p className="font-medium">No overview content available</p>
+                <p className="text-sm">Add rich content in your Sanity Studio to get started!</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="code" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Code Examples</h3>
+          <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+            <div className="space-y-2">
+              <p className="font-medium">No code examples available</p>
+              <p className="text-sm">Code examples coming soon for this page.</p>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="whats-new" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">What's New</h3>
+          <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+            <div className="space-y-2">
+              <p className="font-medium">No recent updates</p>
+              <p className="text-sm">Check back later for page updates.</p>
+              <p className="text-xs text-muted-foreground/60">
+                Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+
+    <div className="mt-12 pt-8 border-t">
+      <div className="text-center text-sm text-muted-foreground">
+        <p>Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}</p>
+      </div>
+    </div>
+  </div>
+)
+
+const ResourceContent = ({ content }) => (
+  <div className="px-8 py-8 max-w-4xl">
+    <Tabs defaultValue="overview" className="w-full">
+      <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="code">Downloads & Links</TabsTrigger>
+        <TabsTrigger value="whats-new">What's new</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="mt-6">
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold">Overview</h3>
+          {content.content && content.content.length > 0 ? (
+            <div className="prose prose-gray max-w-none">
+              <SimpleContentRenderer content={content.content} />
+            </div>
+          ) : (
+            <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+              <div className="space-y-2">
+                <p className="font-medium">No overview content available</p>
+                <p className="text-sm">Add rich content in your Sanity Studio to get started!</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="code" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Downloads & Links</h3>
+          <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+            <div className="space-y-2">
+              <p className="font-medium">No downloads available</p>
+              <p className="text-sm">Resource downloads and links coming soon.</p>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="whats-new" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">What's New</h3>
+          <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+            <div className="space-y-2">
+              <p className="font-medium">No recent updates</p>
+              <p className="text-sm">Check back later for resource updates.</p>
+              <p className="text-xs text-muted-foreground/60">
+                Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+
+    <div className="mt-12 pt-8 border-t">
+      <div className="text-center text-sm text-muted-foreground">
+        <p>Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}</p>
+      </div>
+    </div>
+  </div>
+)
