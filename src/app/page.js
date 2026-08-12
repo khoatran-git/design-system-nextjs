@@ -17,13 +17,15 @@ export default function Home() {
   const [foundations, setFoundations] = useState([])
   const [getStartedPages, setGetStartedPages] = useState([])
   const [resources, setResources] = useState([])
+  const [patterns, setPatterns] = useState([])
   const [categories, setCategories] = useState([])
   const [selectedContent, setSelectedContent] = useState(null)
-  const [selectedContentType, setSelectedContentType] = useState('component') // 'component', 'foundation', 'resource', 'getStarted'
+  const [selectedContentType, setSelectedContentType] = useState('component') // 'component', 'foundation', 'resource', 'getStarted', 'pattern'
   const [expandedMenu, setExpandedMenu] = useState('components')
   const [expandedFoundations, setExpandedFoundations] = useState(false)
   const [expandedGetStarted, setExpandedGetStarted] = useState(false)
   const [expandedResources, setExpandedResources] = useState(false)
+  const [expandedPatterns, setExpandedPatterns] = useState(false)
   const [loading, setLoading] = useState(true)
   const [contentLoading, setContentLoading] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(Date.now())
@@ -36,23 +38,26 @@ export default function Home() {
         const timestamp = lastRefresh
         
         // Use API endpoints instead of direct Sanity calls
-        const [componentsResponse, foundationsResponse, getStartedResponse, resourcesResponse] = await Promise.all([
+        const [componentsResponse, foundationsResponse, getStartedResponse, resourcesResponse, patternsResponse] = await Promise.all([
           fetch(`/api/components?t=${timestamp}`),
           fetch(`/api/foundations?t=${timestamp}`),
           fetch(`/api/get-started?t=${timestamp}`),
-          fetch(`/api/resources?refresh=true&t=${timestamp}`)
+          fetch(`/api/resources?refresh=true&t=${timestamp}`),
+          fetch(`/api/patterns?refresh=true&t=${timestamp}`)
         ])
         
         const componentsData = await componentsResponse.json()
         const foundationsData = await foundationsResponse.json()
         const getStartedData = await getStartedResponse.json()
         const resourcesData = await resourcesResponse.json()
+        const patternsData = await patternsResponse.json()
         
         // Extract components from API response
         const components = componentsData.data || []
         const foundations = foundationsData.data || []
         const getStartedPages = getStartedData.data || []
         const resources = resourcesData.data || []
+        const patterns = patternsData.data || []
         
         // Extract unique categories from components
         const uniqueCategories = [...new Set(
@@ -65,6 +70,7 @@ export default function Home() {
         setFoundations(foundations)
         setGetStartedPages(getStartedPages)
         setResources(resources)
+        setPatterns(patterns)
         setCategories(uniqueCategories.map(cat => ({ category: cat })))
         
         // Set first component as selected by default
@@ -125,6 +131,10 @@ export default function Home() {
 
   const selectResource = (resource) => {
     loadContent('resources', resource.slug.current)
+  }
+
+  const selectPattern = (pattern) => {
+    loadContent('patterns', pattern.slug.current)
   }
 
   const FOUNDATIONS_ITEMS = [
@@ -381,6 +391,48 @@ export default function Home() {
                 </div>
               )}
             </div>
+
+            {/* Patterns */}
+            <div>
+              <button
+                onClick={() => setExpandedPatterns(!expandedPatterns)}
+                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+              >
+                <span>Patterns</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedPatterns ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Patterns List (Nested) */}
+              {expandedPatterns && (
+                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                  {patterns.map((pattern) => (
+                    <button
+                      key={pattern.slug.current}
+                      onClick={() => selectPattern(pattern)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                        selectedContent?._id === pattern._id
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{pattern.title}</span>
+                        <span className="text-xs opacity-60">{pattern.complexity}</span>
+                      </div>
+                    </button>
+                  ))}
+                  
+                  {patterns.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No patterns found. Add some in your Sanity Studio!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </nav>
         </aside>
 
@@ -417,6 +469,8 @@ export default function Home() {
                 <GetStartedContent content={selectedContent} />
               ) : selectedContentType === 'resource' ? (
                 <ResourceContent content={selectedContent} />
+              ) : selectedContentType === 'pattern' ? (
+                <PatternContent content={selectedContent} />
               ) : null}
             </div>
           ) : (
@@ -1077,6 +1131,69 @@ const ResourceContent = ({ content }) => (
             <div className="space-y-2">
               <p className="font-medium">No recent updates</p>
               <p className="text-sm">Check back later for resource updates.</p>
+              <p className="text-xs text-muted-foreground/60">
+                Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+
+    <div className="mt-12 pt-8 border-t">
+      <div className="text-center text-sm text-muted-foreground">
+        <p>Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}</p>
+      </div>
+    </div>
+  </div>
+)
+
+const PatternContent = ({ content }) => (
+  <div className="px-8 py-8 max-w-4xl">
+    <Tabs defaultValue="overview" className="w-full">
+      <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="code">Code Examples</TabsTrigger>
+        <TabsTrigger value="whats-new">What's new</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="mt-6">
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold">Overview</h3>
+          {content.content && content.content.length > 0 ? (
+            <div className="prose prose-gray max-w-none">
+              <SimpleContentRenderer content={content.content} />
+            </div>
+          ) : (
+            <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+              <div className="space-y-2">
+                <p className="font-medium">No overview content available</p>
+                <p className="text-sm">Add rich content in your Sanity Studio to get started!</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="code" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Code Examples</h3>
+          <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+            <div className="space-y-2">
+              <p className="font-medium">Pattern code examples coming soon</p>
+              <p className="text-sm">Interactive pattern demos and code snippets will be available here.</p>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="whats-new" className="mt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">What's New</h3>
+          <div className="p-6 border rounded-lg bg-muted/50 text-muted-foreground text-center">
+            <div className="space-y-2">
+              <p className="font-medium">No recent updates</p>
+              <p className="text-sm">Check back later for pattern updates and improvements.</p>
               <p className="text-xs text-muted-foreground/60">
                 Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}
               </p>
