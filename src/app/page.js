@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { ThemeToggle } from '../components/theme-toggle'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
+import { Checkbox } from '../components/ui/checkbox'
+import { Label } from '../components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { ChevronDown } from 'lucide-react'
 import SimpleContentRenderer from '../components/PortableTextComponents'
@@ -181,6 +184,7 @@ export default function Home() {
               >
                 🔄
               </button>
+              <ThemeToggle />
               <a href="https://github.com/khoatran-git/design-system-nextjs" target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="sm">GitHub</Button>
               </a>
@@ -510,22 +514,22 @@ const ComponentContent = ({ content }) => (
                     <h5 className="text-sm font-medium mb-3">Basic Checkboxes</h5>
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="checkbox1" className="rounded border-gray-300" />
-                        <label htmlFor="checkbox1" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        <Checkbox id="terms" />
+                        <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                           Accept terms and conditions
-                        </label>
+                        </Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="checkbox2" className="rounded border-gray-300" defaultChecked />
-                        <label htmlFor="checkbox2" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        <Checkbox id="newsletter" defaultChecked />
+                        <Label htmlFor="newsletter" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                           Subscribe to newsletter
-                        </label>
+                        </Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="checkbox3" className="rounded border-gray-300" disabled />
-                        <label htmlFor="checkbox3" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        <Checkbox id="disabled-checkbox" disabled />
+                        <Label htmlFor="disabled-checkbox" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                           Disabled checkbox
-                        </label>
+                        </Label>
                       </div>
                     </div>
                   </div>
@@ -536,20 +540,20 @@ const ComponentContent = ({ content }) => (
                       <p className="text-sm text-muted-foreground">Select your interests:</p>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="flex items-center space-x-2">
-                          <input type="checkbox" id="design" className="rounded border-gray-300" />
-                          <label htmlFor="design" className="text-sm">Design</label>
+                          <Checkbox id="design" />
+                          <Label htmlFor="design" className="text-sm">Design</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <input type="checkbox" id="development" className="rounded border-gray-300" />
-                          <label htmlFor="development" className="text-sm">Development</label>
+                          <Checkbox id="development" />
+                          <Label htmlFor="development" className="text-sm">Development</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <input type="checkbox" id="marketing" className="rounded border-gray-300" />
-                          <label htmlFor="marketing" className="text-sm">Marketing</label>
+                          <Checkbox id="marketing" />
+                          <Label htmlFor="marketing" className="text-sm">Marketing</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <input type="checkbox" id="research" className="rounded border-gray-300" />
-                          <label htmlFor="research" className="text-sm">Research</label>
+                          <Checkbox id="research" />
+                          <Label htmlFor="research" className="text-sm">Research</Label>
                         </div>
                       </div>
                     </div>
