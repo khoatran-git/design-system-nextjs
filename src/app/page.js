@@ -851,7 +851,7 @@ function CheckboxForm() {
                         </tr>
                         <tr>
                           <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">onCheckedChange</td>
-                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">(checked: boolean) => void</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">{`(checked: boolean) => void`}</td>
                           <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">-</td>
                         </tr>
                         <tr>
