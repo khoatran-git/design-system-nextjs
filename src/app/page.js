@@ -685,27 +685,179 @@ const ComponentContent = ({ content }) => (
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse border border-gray-300">
                       <thead>
-                        <tr className="bg-gray-100">
-                          <th className="border border-gray-300 px-4 py-2 text-left">Prop</th>
-                          <th className="border border-gray-300 px-4 py-2 text-left">Type</th>
-                          <th className="border border-gray-300 px-4 py-2 text-left">Default</th>
+                        <tr className="bg-gray-100 dark:bg-gray-800">
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">Prop</th>
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">Type</th>
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">Default</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="border border-gray-300 px-4 py-2">variant</td>
-                          <td className="border border-gray-300 px-4 py-2">"default" | "outline" | "ghost" | "destructive" | "secondary" | "link"</td>
-                          <td className="border border-gray-300 px-4 py-2">"default"</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">variant</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">"default" | "outline" | "ghost" | "destructive" | "secondary" | "link"</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">"default"</td>
                         </tr>
                         <tr>
-                          <td className="border border-gray-300 px-4 py-2">size</td>
-                          <td className="border border-gray-300 px-4 py-2">"default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"</td>
-                          <td className="border border-gray-300 px-4 py-2">"default"</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">size</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">"default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">"default"</td>
                         </tr>
                         <tr>
-                          <td className="border border-gray-300 px-4 py-2">asChild</td>
-                          <td className="border border-gray-300 px-4 py-2">boolean</td>
-                          <td className="border border-gray-300 px-4 py-2">false</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">asChild</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">boolean</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">false</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : content.title === 'Checkboxes' ? (
+            <div className="prose prose-gray max-w-none">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Installation</h4>
+                  <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                    <code>npx shadcn@latest add checkbox</code>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Usage</h4>
+                  <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                    <pre>{`import { Checkbox } from "@/components/ui/checkbox"
+
+<Checkbox id="terms" />
+<Label htmlFor="terms">Accept terms and conditions</Label>`}</pre>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Examples</h4>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <p className="mb-2 font-medium">Basic Checkbox</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <pre>{`import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+
+<div className="flex items-center space-x-2">
+  <Checkbox id="terms" />
+  <Label htmlFor="terms">
+    Accept terms and conditions
+  </Label>
+</div>`}</pre>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 font-medium">Disabled</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <pre>{`<div className="flex items-center space-x-2">
+  <Checkbox id="terms2" disabled />
+  <Label htmlFor="terms2">
+    Accept terms and conditions
+  </Label>
+</div>`}</pre>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 font-medium">With Text</p>
+                      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                        <pre>{`<div className="items-top flex space-x-2">
+  <Checkbox id="terms1" />
+  <div className="grid gap-1.5 leading-none">
+    <Label
+      htmlFor="terms1"
+      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+    >
+      Accept terms and conditions
+    </Label>
+    <p className="text-xs text-muted-foreground">
+      You agree to our Terms of Service and Privacy Policy.
+    </p>
+  </div>
+</div>`}</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Form Integration</h4>
+                  <div className="bg-slate-950 text-slate-50 p-4 rounded-lg">
+                    <pre>{`import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+
+const FormSchema = z.object({
+  mobile: z.boolean().default(false).optional(),
+})
+
+function CheckboxForm() {
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      mobile: true,
+    },
+  })
+
+  return (
+    <Form>
+      <FormField
+        control={form.control}
+        name="mobile"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+            <FormControl>
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+            <div className="space-y-1 leading-none">
+              <FormLabel>
+                Mobile notifications
+              </FormLabel>
+            </div>
+          </FormItem>
+        )}
+      />
+    </Form>
+  )
+}`}</pre>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-md font-semibold mb-3">API Reference</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-100 dark:bg-gray-800">
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">Prop</th>
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">Type</th>
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">Default</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">checked</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">boolean</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">false</td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">onCheckedChange</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">(checked: boolean) => void</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">-</td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">disabled</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">boolean</td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">false</td>
                         </tr>
                       </tbody>
                     </table>
