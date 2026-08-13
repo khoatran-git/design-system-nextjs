@@ -2,8 +2,8 @@ import './globals.css'
 import { ThemeProvider } from '../components/theme-provider'
 
 export const metadata = {
-  title: 'shadcn/ui Components Showcase',
-  description: 'A showcase of all available shadcn/ui components',
+  title: 'Group Design System',
+  description: 'The ultimate design system with components, patterns, and foundations',
 }
 
 export default function RootLayout({ children }) {
