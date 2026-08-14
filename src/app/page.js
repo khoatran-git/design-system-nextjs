@@ -153,6 +153,14 @@ export default function Home() {
     { label: 'UX Writing', slug: 'ux-writing' },
   ]
 
+  // Group foundations by category for the new structure
+  const foundationsByCategory = foundations.reduce((acc, foundation) => {
+    const category = foundation.category || 'Other'
+    if (!acc[category]) acc[category] = []
+    acc[category].push(foundation)
+    return acc
+  }, {})
+
   // Group components by category, skip uncategorized
   const componentsByCategory = components.reduce((acc, component) => {
     const category = component.category
@@ -268,18 +276,37 @@ export default function Home() {
               {/* Foundations List (Nested) */}
               {expandedFoundations && (
                 <div className="pl-4 mt-1 space-y-1 border-l border-border">
-                  {foundations.map((foundation) => (
-                    <button
-                      key={foundation.slug.current}
-                      onClick={() => selectFoundation(foundation)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
-                        selectedContent?._id === foundation._id
-                          ? 'bg-primary text-primary-foreground font-medium'
-                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                      }`}
-                    >
-                      {foundation.title}
-                    </button>
+                  {/* Group foundations by Philosophy and Design categories */}
+                  {Object.entries(foundationsByCategory)
+                    .sort(([a], [b]) => {
+                      // Sort Philosophy first, then Design, then others
+                      if (a === 'Philosophy') return -1
+                      if (b === 'Philosophy') return 1
+                      if (a === 'Design') return -1
+                      if (b === 'Design') return 1
+                      return a.localeCompare(b)
+                    })
+                    .map(([category, categoryFoundations]) => (
+                    <div key={category}>
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1">
+                        {category}
+                      </div>
+                      {categoryFoundations
+                        .sort((a, b) => (a.order || 0) - (b.order || 0)) // Sort by order within category
+                        .map((foundation) => (
+                        <button
+                          key={foundation.slug.current}
+                          onClick={() => selectFoundation(foundation)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                            selectedContent?._id === foundation._id
+                              ? 'bg-primary text-primary-foreground font-medium'
+                              : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                          }`}
+                        >
+                          {foundation.title}
+                        </button>
+                      ))}
+                    </div>
                   ))}
                   
                   {foundations.length === 0 && (
