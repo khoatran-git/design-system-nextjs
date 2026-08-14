@@ -184,10 +184,10 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col">
       {/* Debug comment - force deployment */}
       {/* Top Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex-shrink-0">
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -213,7 +213,7 @@ export default function Home() {
       </header>
 
       {/* Main Layout */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left Sidebar - Independently Scrollable */}
         <aside className="w-64 border-r bg-background flex flex-col overflow-hidden">
           <div className="p-4 border-b flex-shrink-0">
@@ -221,7 +221,8 @@ export default function Home() {
           </div>
           
           {/* Scrollable Navigation */}
-          <nav className="p-4 space-y-1 overflow-y-auto flex-1">
+          <nav className="flex-1 overflow-y-auto">
+            <div className="p-4 space-y-1">
             {/* Get Started */}
             <div>
               <button
@@ -502,11 +503,12 @@ export default function Home() {
                 </div>
               )}
             </div>
+            </div>
           </nav>
         </aside>
 
         {/* Main Content Area - Independently Scrollable */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto min-h-0">
           {selectedContent ? (
             <div className="min-h-full">
               {contentLoading && (
@@ -545,7 +547,7 @@ export default function Home() {
               ) : null}
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <h2 className="text-2xl font-bold mb-4">Welcome to Group Design System</h2>
                 <p className="text-muted-foreground mb-6 max-w-md">
