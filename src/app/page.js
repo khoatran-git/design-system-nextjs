@@ -330,47 +330,6 @@ export default function Home() {
 
             <Separator className="my-3" />
 
-            {/* Components (Collapsible) */}
-            <div>
-              <button
-                onClick={() => setExpandedMenu(expandedMenu === 'components' ? null : 'components')}
-                className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-foreground hover:bg-muted flex items-center justify-between"
-              >
-                <span className="font-medium">Components</span>
-                <ChevronDown 
-                  size={16} 
-                  className={`transition-transform duration-200 ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {/* Components List (Nested) - No Categories */}
-              {expandedMenu === 'components' && (
-                <div className="pl-4 mt-2 space-y-1 border-l-2 border-border ml-2">
-                  {components.map((comp) => (
-                    <button
-                      key={comp._id}
-                      onClick={() => selectComponent(comp)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                        selectedContent?._id === comp._id
-                          ? 'bg-accent text-accent-foreground font-medium'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                      }`}
-                    >
-                      {comp.title}
-                    </button>
-                  ))}
-                  
-                  {components.length === 0 && (
-                    <div className="text-xs text-muted-foreground px-3 py-2">
-                      No components found. Add some in your Sanity Studio!
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <Separator className="my-3" />
-
             {/* Styles */}
             <div>
               <button
@@ -411,6 +370,47 @@ export default function Home() {
                   {styles.length === 0 && (
                     <div className="text-xs text-muted-foreground px-3 py-2">
                       No styles found. Add some in your Sanity Studio!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <Separator className="my-3" />
+
+            {/* Components (Collapsible) */}
+            <div>
+              <button
+                onClick={() => setExpandedMenu(expandedMenu === 'components' ? null : 'components')}
+                className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-foreground hover:bg-muted flex items-center justify-between"
+              >
+                <span className="font-medium">Components</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Components List (Nested) - No Categories */}
+              {expandedMenu === 'components' && (
+                <div className="pl-4 mt-2 space-y-1 border-l-2 border-border ml-2">
+                  {components.map((comp) => (
+                    <button
+                      key={comp._id}
+                      onClick={() => selectComponent(comp)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                        selectedContent?._id === comp._id
+                          ? 'bg-accent text-accent-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      }`}
+                    >
+                      {comp.title}
+                    </button>
+                  ))}
+                  
+                  {components.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No components found. Add some in your Sanity Studio!
                     </div>
                   )}
                 </div>
