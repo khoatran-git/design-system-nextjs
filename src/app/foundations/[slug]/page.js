@@ -101,8 +101,8 @@ export default function FoundationPage() {
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Group Design System</h1>
-              <p className="text-sm text-muted-foreground">The ultimate design system</p>
+              <h1 className="text-2xl font-bold tracking-tight">The Design Dictionary</h1>
+              <p className="text-sm text-muted-foreground">A comprehensive design system reference</p>
             </div>
             <div className="flex items-center gap-4">
               <Badge variant="secondary">v1.0</Badge>

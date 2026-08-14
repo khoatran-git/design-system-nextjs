@@ -19,7 +19,6 @@ export async function GET(request, { params }) {
       description,
       content,
       patternType,
-      complexity,
       order,
       status
     }`

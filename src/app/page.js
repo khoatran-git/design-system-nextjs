@@ -37,17 +37,24 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Add cache-busting parameter to ensure fresh data
+        // Add cache-busting parameter and headers to ensure fresh data
         const timestamp = lastRefresh
+        const fetchOptions = {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        }
         
         // Use API endpoints instead of direct Sanity calls
         const [componentsResponse, foundationsResponse, stylesResponse, getStartedResponse, resourcesResponse, patternsResponse] = await Promise.all([
-          fetch(`/api/components?t=${timestamp}`),
-          fetch(`/api/foundations?t=${timestamp}`),
-          fetch(`/api/styles?t=${timestamp}`),
-          fetch(`/api/get-started?t=${timestamp}`),
-          fetch(`/api/resources?refresh=true&t=${timestamp}`),
-          fetch(`/api/patterns?refresh=true&t=${timestamp}`)
+          fetch(`/api/components?t=${timestamp}&refresh=true`, fetchOptions),
+          fetch(`/api/foundations?t=${timestamp}&refresh=true`, fetchOptions),
+          fetch(`/api/styles?t=${timestamp}&refresh=true`, fetchOptions),
+          fetch(`/api/get-started?t=${timestamp}&refresh=true`, fetchOptions),
+          fetch(`/api/resources?refresh=true&t=${timestamp}`, fetchOptions),
+          fetch(`/api/patterns?refresh=true&t=${timestamp}`, fetchOptions)
         ])
         
         const componentsData = await componentsResponse.json()
@@ -64,6 +71,20 @@ export default function Home() {
         const getStartedPages = getStartedData.data || []
         const resources = resourcesData.data || []
         const patterns = patternsData.data || []
+        
+        // Log fetch status for debugging in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔄 Data refreshed at:', new Date().toLocaleTimeString())
+          console.log('📊 Loaded:', {
+            components: components?.length || 0,
+            foundations: foundations?.length || 0,
+            styles: styles?.length || 0,
+            patterns: patterns?.length || 0,
+            resources: resources?.length || 0,
+            getStarted: getStartedPages?.length || 0
+          })
+          console.log('🎨 Styles data:', styles)
+        }
         
         // Extract unique categories from components
         const uniqueCategories = [...new Set(
@@ -95,10 +116,22 @@ export default function Home() {
     fetchData()
   }, [lastRefresh])
 
-  // Function to refresh data
+  // Function to refresh data with aggressive cache busting
   const refreshData = () => {
-    setLastRefresh(Date.now())
+    const timestamp = Date.now()
+    setLastRefresh(timestamp)
     setLoading(true)
+    
+    // Clear any browser cache for our API endpoints
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          if (name.includes('api')) {
+            caches.delete(name)
+          }
+        })
+      })
+    }
   }
 
   // Function to load individual content by type and slug
@@ -108,7 +141,14 @@ export default function Home() {
     setContentLoading(true)
     try {
       const timestamp = Date.now()
-      const response = await fetch(`/api/${type}/${slug}?refresh=true&t=${timestamp}`)
+      const fetchOptions = {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      }
+      const response = await fetch(`/api/${type}/${slug}?refresh=true&t=${timestamp}`, fetchOptions)
       const data = await response.json()
       
       if (response.ok) {
@@ -148,22 +188,6 @@ export default function Home() {
     loadContent('patterns', pattern.slug.current)
   }
 
-  const FOUNDATIONS_ITEMS = [
-    { label: 'Principles', slug: 'principles' },
-    { label: 'Governance', slug: 'governance' },
-  ]
-
-  const DESIGN_SYSTEM_ITEMS = [
-    { label: 'Design tokens', slug: 'design-tokens' },
-    { label: 'Typography', slug: 'typography' },
-    { label: 'Colours', slug: 'colours' },
-    { label: 'Elevation', slug: 'elevation' },
-    { label: 'Motion', slug: 'motion' },
-    { label: 'Usability', slug: 'usability' },
-    { label: 'Accessibility', slug: 'accessibility' },
-    { label: 'UX Writing', slug: 'ux-writing' },
-  ]
-
   // Group foundations by category for the new structure
   const foundationsByCategory = foundations.reduce((acc, foundation) => {
     const category = foundation.category || 'Other'
@@ -191,17 +215,19 @@ export default function Home() {
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">Group Design System</h1>
-              <p className="text-sm text-muted-foreground">The ultimate design system</p>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">The Design Dictionary</h1>
+              <p className="text-sm text-muted-foreground">A comprehensive design system reference</p>
             </div>
             <div className="flex items-center gap-3">
               <Badge variant="secondary" className="text-xs">v1.0</Badge>
               <button 
                 onClick={refreshData}
-                className="px-2 py-1.5 text-xs border rounded-md bg-background hover:bg-muted transition-colors"
-                title="Refresh data"
+                className="px-3 py-1.5 text-xs border rounded-md bg-background hover:bg-muted transition-colors flex items-center gap-1.5"
+                title="Force refresh all content from Sanity"
+                disabled={loading}
               >
-                🔄
+                <span className={loading ? 'animate-spin' : ''}>🔄</span>
+                {loading ? 'Refreshing...' : 'Refresh'}
               </button>
               <ThemeToggle />
               <a href="https://github.com/khoatran-git/design-system-nextjs" target="_blank" rel="noopener noreferrer">
@@ -356,14 +382,7 @@ export default function Home() {
                           : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span>{style.title}</span>
-                        {style.styleCategory && (
-                          <span className="text-xs opacity-60 bg-muted px-1.5 py-0.5 rounded">
-                            {style.styleCategory}
-                          </span>
-                        )}
-                      </div>
+                      <span>{style.title}</span>
                     </button>
                   ))}
                   
@@ -445,12 +464,7 @@ export default function Home() {
                           : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span>{pattern.title}</span>
-                        <span className="text-xs opacity-60 bg-muted px-1.5 py-0.5 rounded">
-                          {pattern.complexity}
-                        </span>
-                      </div>
+                      <span>{pattern.title}</span>
                     </button>
                   ))}
                   
@@ -549,7 +563,7 @@ export default function Home() {
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <h2 className="text-2xl font-bold mb-4">Welcome to Group Design System</h2>
+                <h2 className="text-2xl font-bold mb-4">Welcome to The Design Dictionary</h2>
                 <p className="text-muted-foreground mb-6 max-w-md">
                   {components.length > 0 
                     ? 'Select an item from the sidebar to get started.' 

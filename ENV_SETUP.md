@@ -1,6 +1,6 @@
 # Environment Variables Setup
 
-This guide explains how to configure environment variables for the Group Design System Next.js app with Sanity CMS.
+This guide explains how to configure environment variables for The Design Dictionary Next.js app with Sanity CMS.
 
 ## Overview
 
