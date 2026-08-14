@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Checkbox } from '../components/ui/checkbox'
 import { Label } from '../components/ui/label'
+import { Separator } from '../components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { ChevronDown } from 'lucide-react'
 import SimpleContentRenderer from '../components/PortableTextComponents'
@@ -186,18 +187,18 @@ export default function Home() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Debug comment - force deployment */}
       {/* Top Header */}
-      <header className="border-b bg-background sticky top-0 z-50">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Group Design System</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">Group Design System</h1>
               <p className="text-sm text-muted-foreground">The ultimate design system</p>
             </div>
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary">v1.0</Badge>
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="text-xs">v1.0</Badge>
               <button 
                 onClick={refreshData}
-                className="px-2 py-1 text-xs border rounded bg-muted hover:bg-accent"
+                className="px-2 py-1.5 text-xs border rounded-md bg-background hover:bg-muted transition-colors"
                 title="Refresh data"
               >
                 🔄
@@ -214,20 +215,20 @@ export default function Home() {
       {/* Main Layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar - Independently Scrollable */}
-        <aside className="w-64 border-r bg-muted/30 flex flex-col overflow-hidden">
-          <div className="p-4 border-b bg-background flex-shrink-0">
-            <h2 className="text-sm font-semibold">Menu</h2>
+        <aside className="w-64 border-r bg-background flex flex-col overflow-hidden">
+          <div className="p-4 border-b flex-shrink-0">
+            <h2 className="text-sm font-semibold text-muted-foreground">Navigation</h2>
           </div>
           
           {/* Scrollable Navigation */}
-          <nav className="p-4 space-y-2 overflow-y-auto flex-1">
+          <nav className="p-4 space-y-1 overflow-y-auto flex-1">
             {/* Get Started */}
             <div>
               <button
                 onClick={() => setExpandedGetStarted(!expandedGetStarted)}
-                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+                className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-foreground hover:bg-muted flex items-center justify-between"
               >
-                <span>Get Started</span>
+                <span className="font-medium">Get Started</span>
                 <ChevronDown 
                   size={16} 
                   className={`transition-transform duration-200 ${expandedGetStarted ? 'rotate-180' : ''}`}
@@ -236,15 +237,15 @@ export default function Home() {
 
               {/* Get Started List (Nested) */}
               {expandedGetStarted && (
-                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                <div className="pl-4 mt-2 space-y-1 border-l-2 border-border ml-2">
                   {getStartedPages.map((page) => (
                     <button
                       key={page.slug.current}
                       onClick={() => selectGetStarted(page)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                         selectedContent?._id === page._id
-                          ? 'bg-primary text-primary-foreground font-medium'
-                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                          ? 'bg-accent text-accent-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       }`}
                     >
                       {page.title}
@@ -260,13 +261,15 @@ export default function Home() {
               )}
             </div>
 
+            <Separator className="my-3" />
+
             {/* Foundations (Collapsible) */}
             <div>
               <button
                 onClick={() => setExpandedFoundations(!expandedFoundations)}
-                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+                className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-foreground hover:bg-muted flex items-center justify-between"
               >
-                <span>Foundations</span>
+                <span className="font-medium">Foundations</span>
                 <ChevronDown 
                   size={16} 
                   className={`transition-transform duration-200 ${expandedFoundations ? 'rotate-180' : ''}`}
@@ -275,7 +278,7 @@ export default function Home() {
 
               {/* Foundations List (Nested) */}
               {expandedFoundations && (
-                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                <div className="pl-4 mt-2 space-y-3 border-l-2 border-border ml-2">
                   {/* Group foundations by Philosophy and Design categories */}
                   {Object.entries(foundationsByCategory)
                     .sort(([a], [b]) => {
@@ -286,26 +289,32 @@ export default function Home() {
                       if (b === 'Design') return 1
                       return a.localeCompare(b)
                     })
-                    .map(([category, categoryFoundations]) => (
+                    .map(([category, categoryFoundations], index) => (
                     <div key={category}>
                       <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1">
                         {category}
                       </div>
-                      {categoryFoundations
-                        .sort((a, b) => (a.order || 0) - (b.order || 0)) // Sort by order within category
-                        .map((foundation) => (
-                        <button
-                          key={foundation.slug.current}
-                          onClick={() => selectFoundation(foundation)}
-                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
-                            selectedContent?._id === foundation._id
-                              ? 'bg-primary text-primary-foreground font-medium'
-                              : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                          }`}
-                        >
-                          {foundation.title}
-                        </button>
-                      ))}
+                      <div className="space-y-1">
+                        {categoryFoundations
+                          .sort((a, b) => (a.order || 0) - (b.order || 0)) // Sort by order within category
+                          .map((foundation) => (
+                          <button
+                            key={foundation.slug.current}
+                            onClick={() => selectFoundation(foundation)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                              selectedContent?._id === foundation._id
+                                ? 'bg-accent text-accent-foreground font-medium'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                            }`}
+                          >
+                            {foundation.title}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Add separator between categories except for the last one */}
+                      {index < Object.entries(foundationsByCategory).length - 1 && (
+                        <Separator className="my-2" />
+                      )}
                     </div>
                   ))}
                   
@@ -318,13 +327,15 @@ export default function Home() {
               )}
             </div>
 
+            <Separator className="my-3" />
+
             {/* Components (Collapsible) */}
             <div>
               <button
                 onClick={() => setExpandedMenu(expandedMenu === 'components' ? null : 'components')}
-                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+                className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-foreground hover:bg-muted flex items-center justify-between"
               >
-                <span>Components</span>
+                <span className="font-medium">Components</span>
                 <ChevronDown 
                   size={16} 
                   className={`transition-transform duration-200 ${expandedMenu === 'components' ? 'rotate-180' : ''}`}
@@ -333,43 +344,56 @@ export default function Home() {
 
               {/* Components List (Nested) */}
               {expandedMenu === 'components' && (
-                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                <div className="pl-4 mt-2 space-y-3 border-l-2 border-border ml-2">
                   {/* Components with categories */}
-                  {Object.entries(componentsByCategory).map(([category, categoryComponents]) => (
+                  {Object.entries(componentsByCategory).map(([category, categoryComponents], index) => (
                     <div key={category}>
                       <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1">
                         {category}
                       </div>
-                      {categoryComponents.map((comp) => (
-                        <button
-                          key={comp._id}
-                          onClick={() => selectComponent(comp)}
-                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
-                            selectedContent?._id === comp._id
-                              ? 'bg-primary text-primary-foreground font-medium'
-                              : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                          }`}
-                        >
-                          {comp.title}
-                        </button>
-                      ))}
+                      <div className="space-y-1">
+                        {categoryComponents.map((comp) => (
+                          <button
+                            key={comp._id}
+                            onClick={() => selectComponent(comp)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                              selectedContent?._id === comp._id
+                                ? 'bg-accent text-accent-foreground font-medium'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                            }`}
+                          >
+                            {comp.title}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Add separator between categories except for the last one */}
+                      {index < Object.entries(componentsByCategory).length - 1 && (
+                        <Separator className="my-2" />
+                      )}
                     </div>
                   ))}
                   
                   {/* Components without categories */}
-                  {components.filter(comp => !comp.category).map((comp) => (
-                    <button
-                      key={comp._id}
-                      onClick={() => selectComponent(comp)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
-                        selectedContent?._id === comp._id
-                          ? 'bg-primary text-primary-foreground font-medium'
-                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                      }`}
-                    >
-                      {comp.title}
-                    </button>
-                  ))}
+                  {components.filter(comp => !comp.category).length > 0 && (
+                    <>
+                      {Object.entries(componentsByCategory).length > 0 && <Separator className="my-2" />}
+                      <div className="space-y-1">
+                        {components.filter(comp => !comp.category).map((comp) => (
+                          <button
+                            key={comp._id}
+                            onClick={() => selectComponent(comp)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                              selectedContent?._id === comp._id
+                                ? 'bg-accent text-accent-foreground font-medium'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                            }`}
+                          >
+                            {comp.title}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                   
                   {components.length === 0 && (
                     <div className="text-xs text-muted-foreground px-3 py-2">
@@ -380,13 +404,61 @@ export default function Home() {
               )}
             </div>
 
+            <Separator className="my-3" />
+
+            {/* Patterns */}
+            <div>
+              <button
+                onClick={() => setExpandedPatterns(!expandedPatterns)}
+                className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-foreground hover:bg-muted flex items-center justify-between"
+              >
+                <span className="font-medium">Patterns</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedPatterns ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Patterns List (Nested) */}
+              {expandedPatterns && (
+                <div className="pl-4 mt-2 space-y-1 border-l-2 border-border ml-2">
+                  {patterns.map((pattern) => (
+                    <button
+                      key={pattern.slug.current}
+                      onClick={() => selectPattern(pattern)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                        selectedContent?._id === pattern._id
+                          ? 'bg-accent text-accent-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{pattern.title}</span>
+                        <span className="text-xs opacity-60 bg-muted px-1.5 py-0.5 rounded">
+                          {pattern.complexity}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                  
+                  {patterns.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No patterns found. Add some in your Sanity Studio!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <Separator className="my-3" />
+
             {/* Resources */}
             <div>
               <button
                 onClick={() => setExpandedResources(!expandedResources)}
-                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
+                className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-foreground hover:bg-muted flex items-center justify-between"
               >
-                <span>Resources</span>
+                <span className="font-medium">Resources</span>
                 <ChevronDown 
                   size={16} 
                   className={`transition-transform duration-200 ${expandedResources ? 'rotate-180' : ''}`}
@@ -395,15 +467,15 @@ export default function Home() {
 
               {/* Resources List (Nested) */}
               {expandedResources && (
-                <div className="pl-4 mt-1 space-y-1 border-l border-border">
+                <div className="pl-4 mt-2 space-y-1 border-l-2 border-border ml-2">
                   {resources.map((resource) => (
                     <button
                       key={resource.slug.current}
                       onClick={() => selectResource(resource)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                         selectedContent?._id === resource._id
-                          ? 'bg-primary text-primary-foreground font-medium'
-                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                          ? 'bg-accent text-accent-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       }`}
                     >
                       {resource.title}
@@ -413,48 +485,6 @@ export default function Home() {
                   {resources.length === 0 && (
                     <div className="text-xs text-muted-foreground px-3 py-2">
                       No resources found. Add some in your Sanity Studio!
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Patterns */}
-            <div>
-              <button
-                onClick={() => setExpandedPatterns(!expandedPatterns)}
-                className="w-full text-left px-3 py-2.5 rounded-md text-sm transition-all duration-200 text-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
-              >
-                <span>Patterns</span>
-                <ChevronDown 
-                  size={16} 
-                  className={`transition-transform duration-200 ${expandedPatterns ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {/* Patterns List (Nested) */}
-              {expandedPatterns && (
-                <div className="pl-4 mt-1 space-y-1 border-l border-border">
-                  {patterns.map((pattern) => (
-                    <button
-                      key={pattern.slug.current}
-                      onClick={() => selectPattern(pattern)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${
-                        selectedContent?._id === pattern._id
-                          ? 'bg-primary text-primary-foreground font-medium'
-                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{pattern.title}</span>
-                        <span className="text-xs opacity-60">{pattern.complexity}</span>
-                      </div>
-                    </button>
-                  ))}
-                  
-                  {patterns.length === 0 && (
-                    <div className="text-xs text-muted-foreground px-3 py-2">
-                      No patterns found. Add some in your Sanity Studio!
                     </div>
                   )}
                 </div>
@@ -474,13 +504,13 @@ export default function Home() {
               )}
               
               {/* Banner Section */}
-              <div className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
-                <div className="px-8 py-12">
+              <div className="border-b bg-muted/20">
+                <div className="px-8 py-8">
                   <div className="max-w-4xl">
                     <div className="mb-4">
-                      <h1 className="text-4xl font-bold tracking-tight">{selectedContent.title}</h1>
+                      <h1 className="text-3xl font-bold tracking-tight text-foreground">{selectedContent.title}</h1>
                     </div>
-                    <p className="text-lg text-muted-foreground max-w-2xl">
+                    <p className="text-base text-muted-foreground max-w-2xl">
                       {selectedContent.description || 'No description provided'}
                     </p>
                   </div>
