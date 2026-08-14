@@ -16,14 +16,16 @@ export default function Home() {
   const router = useRouter()
   const [components, setComponents] = useState([])
   const [foundations, setFoundations] = useState([])
+  const [styles, setStyles] = useState([])
   const [getStartedPages, setGetStartedPages] = useState([])
   const [resources, setResources] = useState([])
   const [patterns, setPatterns] = useState([])
   const [categories, setCategories] = useState([])
   const [selectedContent, setSelectedContent] = useState(null)
-  const [selectedContentType, setSelectedContentType] = useState('component') // 'component', 'foundation', 'resource', 'getStarted', 'pattern'
+  const [selectedContentType, setSelectedContentType] = useState('component') // 'component', 'foundation', 'style', 'resource', 'getStarted', 'pattern'
   const [expandedMenu, setExpandedMenu] = useState('components')
   const [expandedFoundations, setExpandedFoundations] = useState(false)
+  const [expandedStyles, setExpandedStyles] = useState(false)
   const [expandedGetStarted, setExpandedGetStarted] = useState(false)
   const [expandedResources, setExpandedResources] = useState(false)
   const [expandedPatterns, setExpandedPatterns] = useState(false)
@@ -39,9 +41,10 @@ export default function Home() {
         const timestamp = lastRefresh
         
         // Use API endpoints instead of direct Sanity calls
-        const [componentsResponse, foundationsResponse, getStartedResponse, resourcesResponse, patternsResponse] = await Promise.all([
+        const [componentsResponse, foundationsResponse, stylesResponse, getStartedResponse, resourcesResponse, patternsResponse] = await Promise.all([
           fetch(`/api/components?t=${timestamp}`),
           fetch(`/api/foundations?t=${timestamp}`),
+          fetch(`/api/styles?t=${timestamp}`),
           fetch(`/api/get-started?t=${timestamp}`),
           fetch(`/api/resources?refresh=true&t=${timestamp}`),
           fetch(`/api/patterns?refresh=true&t=${timestamp}`)
@@ -49,6 +52,7 @@ export default function Home() {
         
         const componentsData = await componentsResponse.json()
         const foundationsData = await foundationsResponse.json()
+        const stylesData = await stylesResponse.json()
         const getStartedData = await getStartedResponse.json()
         const resourcesData = await resourcesResponse.json()
         const patternsData = await patternsResponse.json()
@@ -56,6 +60,7 @@ export default function Home() {
         // Extract components from API response
         const components = componentsData.data || []
         const foundations = foundationsData.data || []
+        const styles = stylesData.data || []
         const getStartedPages = getStartedData.data || []
         const resources = resourcesData.data || []
         const patterns = patternsData.data || []
@@ -69,6 +74,7 @@ export default function Home() {
         
         setComponents(components)
         setFoundations(foundations)
+        setStyles(styles)
         setGetStartedPages(getStartedPages)
         setResources(resources)
         setPatterns(patterns)
@@ -126,6 +132,10 @@ export default function Home() {
     loadContent('foundations', foundation.slug.current)
   }
 
+  const selectStyle = (style) => {
+    loadContent('styles', style.slug.current)
+  }
+
   const selectGetStarted = (page) => {
     loadContent('get-started', page.slug.current)
   }
@@ -159,16 +169,6 @@ export default function Home() {
     const category = foundation.category || 'Other'
     if (!acc[category]) acc[category] = []
     acc[category].push(foundation)
-    return acc
-  }, {})
-
-  // Group components by category, skip uncategorized
-  const componentsByCategory = components.reduce((acc, component) => {
-    const category = component.category
-    if (category) { // Only include components with categories
-      if (!acc[category]) acc[category] = []
-      acc[category].push(component)
-    }
     return acc
   }, {})
 
@@ -342,62 +342,74 @@ export default function Home() {
                 />
               </button>
 
-              {/* Components List (Nested) */}
+              {/* Components List (Nested) - No Categories */}
               {expandedMenu === 'components' && (
-                <div className="pl-4 mt-2 space-y-3 border-l-2 border-border ml-2">
-                  {/* Components with categories */}
-                  {Object.entries(componentsByCategory).map(([category, categoryComponents], index) => (
-                    <div key={category}>
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1">
-                        {category}
-                      </div>
-                      <div className="space-y-1">
-                        {categoryComponents.map((comp) => (
-                          <button
-                            key={comp._id}
-                            onClick={() => selectComponent(comp)}
-                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                              selectedContent?._id === comp._id
-                                ? 'bg-accent text-accent-foreground font-medium'
-                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                            }`}
-                          >
-                            {comp.title}
-                          </button>
-                        ))}
-                      </div>
-                      {/* Add separator between categories except for the last one */}
-                      {index < Object.entries(componentsByCategory).length - 1 && (
-                        <Separator className="my-2" />
-                      )}
-                    </div>
+                <div className="pl-4 mt-2 space-y-1 border-l-2 border-border ml-2">
+                  {components.map((comp) => (
+                    <button
+                      key={comp._id}
+                      onClick={() => selectComponent(comp)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                        selectedContent?._id === comp._id
+                          ? 'bg-accent text-accent-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      }`}
+                    >
+                      {comp.title}
+                    </button>
                   ))}
-                  
-                  {/* Components without categories */}
-                  {components.filter(comp => !comp.category).length > 0 && (
-                    <>
-                      {Object.entries(componentsByCategory).length > 0 && <Separator className="my-2" />}
-                      <div className="space-y-1">
-                        {components.filter(comp => !comp.category).map((comp) => (
-                          <button
-                            key={comp._id}
-                            onClick={() => selectComponent(comp)}
-                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                              selectedContent?._id === comp._id
-                                ? 'bg-accent text-accent-foreground font-medium'
-                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                            }`}
-                          >
-                            {comp.title}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
                   
                   {components.length === 0 && (
                     <div className="text-xs text-muted-foreground px-3 py-2">
                       No components found. Add some in your Sanity Studio!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <Separator className="my-3" />
+
+            {/* Styles */}
+            <div>
+              <button
+                onClick={() => setExpandedStyles(!expandedStyles)}
+                className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-foreground hover:bg-muted flex items-center justify-between"
+              >
+                <span className="font-medium">Styles</span>
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform duration-200 ${expandedStyles ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Styles List (Nested) */}
+              {expandedStyles && (
+                <div className="pl-4 mt-2 space-y-1 border-l-2 border-border ml-2">
+                  {styles.map((style) => (
+                    <button
+                      key={style.slug.current}
+                      onClick={() => selectStyle(style)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                        selectedContent?._id === style._id
+                          ? 'bg-accent text-accent-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{style.title}</span>
+                        {style.styleCategory && (
+                          <span className="text-xs opacity-60 bg-muted px-1.5 py-0.5 rounded">
+                            {style.styleCategory}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                  
+                  {styles.length === 0 && (
+                    <div className="text-xs text-muted-foreground px-3 py-2">
+                      No styles found. Add some in your Sanity Studio!
                     </div>
                   )}
                 </div>
@@ -522,6 +534,8 @@ export default function Home() {
                 <ComponentContent content={selectedContent} />
               ) : selectedContentType === 'foundation' ? (
                 <FoundationContent content={selectedContent} />
+              ) : selectedContentType === 'style' ? (
+                <StyleContent content={selectedContent} />
               ) : selectedContentType === 'getstarted' ? (
                 <GetStartedContent content={selectedContent} />
               ) : selectedContentType === 'resource' ? (
@@ -1264,6 +1278,25 @@ const PatternContent = ({ content }) => (
       <div className="text-center text-sm text-muted-foreground">
         <p>Last updated: {content._updatedAt ? new Date(content._updatedAt).toLocaleDateString() : 'Unknown'}</p>
       </div>
+    </div>
+  </div>
+)
+
+// Style Content Component
+const StyleContent = ({ content }) => (
+  <div className="px-8 py-8 max-w-4xl">
+    <div className="space-y-6">
+      <h3 className="text-lg font-semibold">Style Guide</h3>
+      
+      {(content.content && content.content.length > 0) ? (
+        <div className="prose prose-gray max-w-none">
+          <SimpleContentRenderer content={content.content} />
+        </div>
+      ) : (
+        <div className="text-muted-foreground">
+          <p>No style content available yet. Add some content in your Sanity Studio!</p>
+        </div>
+      )}
     </div>
   </div>
 )
