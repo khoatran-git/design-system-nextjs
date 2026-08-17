@@ -3,7 +3,7 @@ import { ThemeProvider } from '../components/theme-provider'
 
 export const metadata = {
   title: 'The Design Dictionary',
-  description: 'A comprehensive design system reference with components, patterns, and foundations',
+  description: 'A comprehensive design source of truth with components, patterns, and foundations',
 }
 
 export default function RootLayout({ children }) {

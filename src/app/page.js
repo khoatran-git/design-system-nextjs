@@ -216,7 +216,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-foreground">The Design Dictionary</h1>
-              <p className="text-sm text-muted-foreground">A comprehensive design system reference</p>
+              <p className="text-sm text-muted-foreground">A comprehensive design source of truth</p>
             </div>
             <div className="flex items-center gap-3">
               <Badge variant="secondary" className="text-xs">v1.0</Badge>
