@@ -5,7 +5,7 @@ import {schemaTypes} from './sanity/schemaTypes'
 
 export default defineConfig({
   name: 'default',
-  title: 'The Design Dictionary',
+  title: 'Sovico Design Dictionary',
   projectId: 'YOUR_PROJECT_ID', // We'll update this after creating Sanity project
   dataset: 'production',
   plugins: [structureTool(), visionTool()],

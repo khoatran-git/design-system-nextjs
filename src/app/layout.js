@@ -2,7 +2,7 @@ import './globals.css'
 import { ThemeProvider } from '../components/theme-provider'
 
 export const metadata = {
-  title: 'The Design Dictionary',
+  title: 'Sovico Design Dictionary',
   description: 'A comprehensive design source of truth with components, patterns, and foundations',
 }
 

@@ -215,7 +215,7 @@ export default function Home() {
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">The Design Dictionary</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">Sovico Design Dictionary</h1>
               <p className="text-sm text-muted-foreground">A comprehensive design source of truth</p>
             </div>
             <div className="flex items-center gap-3">
@@ -563,7 +563,7 @@ export default function Home() {
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <h2 className="text-2xl font-bold mb-4">Welcome to The Design Dictionary</h2>
+                <h2 className="text-2xl font-bold mb-4">Welcome to Sovico Design Dictionary</h2>
                 <p className="text-muted-foreground mb-6 max-w-md">
                   {components.length > 0 
                     ? 'Select an item from the sidebar to get started.' 
